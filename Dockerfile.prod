@@ -1,0 +1,19 @@
+FROM node:14.4.0-stretch AS build-stage
+
+# buildする
+WORKDIR /opt/drive
+COPY package.json webpack.config.js tsconfig.json ./
+COPY patches ./patches
+COPY src ./src
+
+RUN yarn && yarn build
+
+FROM alpine:3.12.0
+
+# # 必要なファイルを移動させる
+WORKDIR /opt/drive
+COPY --from=build-stage /opt/drive/dist/server.js ./
+RUN apk add npm=12.17.0-r0
+EXPOSE 3000
+
+CMD [ "node", "server.js" ]

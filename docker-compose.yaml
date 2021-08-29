@@ -1,0 +1,52 @@
+version: "3.1"
+services:
+  pgadmin4:
+    # データベース接続ツール
+    image: dpage/pgadmin4:4.2
+    ports:
+      - 8080:80
+    volumes:
+      - ./docker/db/pgadmin4:/var/lib/pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: root
+      PGADMIN_DEFAULT_PASSWORD: root
+    hostname: pgadmin4
+    restart: always
+  backend:
+    image: node:14.4.0-alpine
+    working_dir: /opt/drive
+    environment:
+      NODE_ENV: development
+      TZ: Asia/Tokyo
+    env_file:
+      - .env
+    volumes:
+      - ./:/opt/drive
+      - /opt/drive/dist
+    ports:
+      - 9000:3000
+    command: sh -c 'yarn install && yarn webpack:build-dev && yarn watch'
+    depends_on:
+      - db
+  db:
+    # aurora互換性考慮
+    # https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/AuroraUserGuide/AuroraPostgreSQL.Updates.20180305.html
+    image: postgres:11.6-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: koa_sample
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: secret
+      LANG: "ja_JP.utf8"
+    volumes:
+      - /var/lib/postgresql/data
+    ports:
+      - 5432:5432
+  swagger:
+    image: swaggerapi/swagger-ui
+    environment:
+      SWAGGER_JSON: /openapi.yaml
+    volumes:
+      - ./doc/openapi.yaml:/openapi.yaml
+    ports:
+      - 8081:8080
