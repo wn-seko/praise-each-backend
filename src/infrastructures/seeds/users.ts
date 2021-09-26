@@ -9,7 +9,7 @@ export async function seed(knex: Knex): Promise<void> {
   // Inserts seed entries
   await knex<User>('users').insert([
     {
-      id: 'user-0000',
+      id: '00000000-0000-0000-0000-000000000000',
       snsId: 'dummy1',
       name: 'ME',
       icon: 'dummy',
@@ -17,7 +17,7 @@ export async function seed(knex: Knex): Promise<void> {
       updatedAt: dayjs(),
     },
     {
-      id: 'user-0001',
+      id: '00000000-0000-0000-0000-000000000001',
       snsId: 'dummy1',
       name: 'User-1',
       icon: 'dummy',
@@ -25,7 +25,7 @@ export async function seed(knex: Knex): Promise<void> {
       updatedAt: dayjs(),
     },
     {
-      id: 'user-0002',
+      id: '00000000-0000-0000-0000-000000000002',
       snsId: 'dummy2',
       name: 'User-2',
       icon: 'dummy',
@@ -33,7 +33,7 @@ export async function seed(knex: Knex): Promise<void> {
       updatedAt: dayjs(),
     },
     {
-      id: 'user-0003',
+      id: '00000000-0000-0000-0000-000000000003',
       snsId: 'dummy3',
       name: 'User-3',
       icon: 'dummy',

@@ -21,7 +21,7 @@ export class PraiseController {
   public async createPraise(ctx: Koa.Context): Promise<void> {
     const { from, to, message, tags } = ctx.request.body
     const praise = await this.praiseService.createPraise(
-      from || 'user-0000',
+      from || '00000000-0000-0000-0000-000000000000',
       to,
       message,
       tags,
