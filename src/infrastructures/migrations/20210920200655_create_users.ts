@@ -4,8 +4,9 @@ export async function up(knex: Knex): Promise<void> {
   if (!(await knex.schema.hasTable('users'))) {
     return knex.schema.createTable('users', (t) => {
       t.string('id').primary()
-      t.string('name').references('id').inTable('users').notNullable()
-      t.string('icon').references('id').inTable('users').notNullable()
+      t.string('snsId').notNullable()
+      t.string('name').notNullable()
+      t.string('icon').notNullable()
       t.date('createdAt').notNullable()
       t.date('updatedAt').notNullable()
     })
