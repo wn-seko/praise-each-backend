@@ -2,7 +2,7 @@ import { Praise } from '~/domains/entities/praise'
 import { User } from '~/domains/entities/user'
 import { PraiseRepository } from '~/domains/repositories/praise'
 import { UserRepository } from '~/domains/repositories/user'
-import { ApplicationError } from '~/services/errors'
+import { ApplicationError, errorCode } from '~/services/errors/index'
 
 export class PraiseService {
   private readonly praiseRepository: PraiseRepository
@@ -20,7 +20,9 @@ export class PraiseService {
     const user = await this.userRepository.getById(userId)
 
     if (!user) {
-      throw new ApplicationError(404, { code: 'user not found' })
+      throw new ApplicationError(errorCode.NOT_FOUND, 'User is not found.', {
+        id: userId,
+      })
     }
 
     return user
@@ -30,8 +32,8 @@ export class PraiseService {
     const praise = await this.praiseRepository.getById(praiseId)
 
     if (!praise) {
-      throw new ApplicationError(404, {
-        code: `praise is not found. ID: ${praiseId}`,
+      throw new ApplicationError(errorCode.NOT_FOUND, 'Praise is not found.', {
+        id: praiseId,
       })
     }
 
