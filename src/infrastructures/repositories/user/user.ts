@@ -30,7 +30,7 @@ export class SQLUserRepository implements UserRepository {
   async search(word: string): Promise<User[]> {
     const results = await knex<UserType>('users').where(
       'name',
-      'like',
+      'ilike',
       `%${word}%`,
     )
     return results.map(resultToUser)
