@@ -41,8 +41,11 @@ module.exports = {
    * @type {Resolve}
    */
   resolve: {
+    alias: {
+      '~': path.resolve(__dirname, 'src'),
+    },
     modules: [path.resolve(__dirname, 'src'), 'node_modules'],
-    extensions: ['.ts', '.tsx', '.js'],
+    extensions: ['.ts', '.js'],
   },
 
   /**

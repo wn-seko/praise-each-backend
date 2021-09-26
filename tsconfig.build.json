@@ -5,6 +5,10 @@
     "lib": ["es2019"],
     "sourceMap": true,
     "outDir": "./dist",
+    "baseUrl": "./src",
+    "paths": {
+      "~/*": ["./*"]
+    },
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
