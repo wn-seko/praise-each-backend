@@ -7,8 +7,8 @@ export async function up(knex: Knex): Promise<void> {
       t.string('snsId').notNullable()
       t.string('name').notNullable()
       t.string('icon').notNullable()
-      t.date('createdAt').notNullable()
-      t.date('updatedAt').notNullable()
+      t.timestamp('createdAt').notNullable()
+      t.timestamp('updatedAt').notNullable()
     })
   } else {
     console.warn('users is exists.')

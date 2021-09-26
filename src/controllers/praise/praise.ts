@@ -1,21 +1,29 @@
 import Koa from 'koa'
+import { PraisePresenter } from '~/presenter/praise'
 import { PraiseService } from '~/services/praise'
 
 export class PraiseController {
   private readonly praiseService: PraiseService
+  private readonly praisePresenter: PraisePresenter
 
-  public constructor(praiseService: PraiseService) {
+  public constructor(
+    praiseService: PraiseService,
+    praisePresenter: PraisePresenter,
+  ) {
     this.praiseService = praiseService
+    this.praisePresenter = praisePresenter
   }
 
   public async listPraises(ctx: Koa.Context): Promise<void> {
     const praises = await this.praiseService.listPraises()
-    ctx.body = praises
+    ctx.body = await this.praisePresenter.praisesToResponse(praises)
   }
 
   public async getPraise(ctx: Koa.Context): Promise<void> {
     const praise = await this.praiseService.getPraise(ctx.params['id'])
     ctx.body = praise
+      ? await this.praisePresenter.praiseToResponse(praise)
+      : null
   }
 
   public async createPraise(ctx: Koa.Context): Promise<void> {
@@ -27,7 +35,7 @@ export class PraiseController {
       tags,
     )
     ctx.status = 201
-    ctx.body = praise
+    ctx.body = await this.praisePresenter.praiseToResponse(praise)
   }
 
   public async updatePraise(ctx: Koa.Context): Promise<void> {
@@ -41,7 +49,7 @@ export class PraiseController {
       tags,
     )
     ctx.status = 200
-    ctx.body = praise
+    ctx.body = await this.praisePresenter.praiseToResponse(praise)
   }
 
   public async deletePraise(ctx: Koa.Context): Promise<void> {

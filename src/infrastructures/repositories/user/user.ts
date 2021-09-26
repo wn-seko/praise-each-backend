@@ -22,6 +22,11 @@ export class SQLUserRepository implements UserRepository {
     return result ? resultToUser(result) : undefined
   }
 
+  async getByIds(ids: string[]): Promise<User[]> {
+    const results = await knex<UserType>('users').whereIn('id', ids)
+    return results.map(resultToUser)
+  }
+
   async getList(): Promise<User[]> {
     const results = await knex<UserType>('users')
     return results.map(resultToUser)

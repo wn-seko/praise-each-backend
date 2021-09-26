@@ -3,12 +3,20 @@ import dayjs, { Dayjs } from 'dayjs'
 import { SystemInfo } from '~/utils/types'
 
 interface Props {
-  name: string
   snsId: string
+  name: string
   icon: string
 }
 
 export type UserType = Props & SystemInfo
+
+export type UserResponse = Omit<
+  UserType,
+  'snsId' | 'createdAt' | 'updatedAt'
+> & {
+  createdAt: string
+  updatedAt: string
+}
 
 export class User {
   public readonly id: string
@@ -36,6 +44,7 @@ export class User {
   public toJSON() {
     return {
       id: this.id,
+      snsId: this.snsId,
       name: this.name,
       icon: this.icon,
       createdAt: this.createdAt.toISOString(),

@@ -6,6 +6,7 @@ import {
   checkMinLength,
   checkValidUuidFormat,
 } from '../validator'
+import { UserResponse } from './user'
 
 interface Props {
   from: string
@@ -15,6 +16,16 @@ interface Props {
 }
 
 export type PraiseType = Props & SystemInfo
+
+export type PraiseResponse = Omit<
+  PraiseType,
+  'from' | 'to' | 'createdAt' | 'updatedAt'
+> & {
+  from: UserResponse
+  to: UserResponse
+  createdAt: string
+  updatedAt: string
+}
 
 export class Praise {
   public readonly id: string
