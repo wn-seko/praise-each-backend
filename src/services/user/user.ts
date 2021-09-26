@@ -22,6 +22,10 @@ export class UserService {
     return await this.userRepository.getList()
   }
 
+  public async search(word: string): Promise<User[]> {
+    return await this.userRepository.search(word)
+  }
+
   public async getUser(id: string): Promise<User | undefined> {
     return await this.userRepository.getById(id)
   }

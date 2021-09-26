@@ -1,6 +1,5 @@
 import dayjs from 'dayjs'
 import * as Knex from 'knex'
-import { v4 as uuid } from 'uuid'
 import { User } from '~/domains/entities/user'
 
 export async function seed(knex: Knex): Promise<void> {

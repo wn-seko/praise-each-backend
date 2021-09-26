@@ -9,8 +9,14 @@ export class UserController {
   }
 
   public async listUsers(ctx: Koa.Context): Promise<void> {
-    const users = await this.userService.listUsers()
-    ctx.body = users
+    const { word } = ctx.query
+    if (typeof word === 'string') {
+      const users = await this.userService.search(word)
+      ctx.body = users
+    } else {
+      const users = await this.userService.listUsers()
+      ctx.body = users
+    }
   }
 
   public async getUser(ctx: Koa.Context): Promise<void> {
