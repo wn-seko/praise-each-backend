@@ -42,6 +42,7 @@ export class Praise {
     return {
       id: this.id,
       from: this.from,
+      to: this.to,
       message: this.message,
       tags: this.tags,
       createdAt: this.createdAt.toISOString(),

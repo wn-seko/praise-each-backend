@@ -10,6 +10,14 @@ export async function seed(knex: Knex): Promise<void> {
   // Inserts seed entries
   await knex<User>('users').insert([
     {
+      id: 'user-0000',
+      snsId: 'dummy1',
+      name: 'ME',
+      icon: 'dummy',
+      createdAt: dayjs(),
+      updatedAt: dayjs(),
+    },
+    {
       id: 'user-0001',
       snsId: 'dummy1',
       name: 'User-1',

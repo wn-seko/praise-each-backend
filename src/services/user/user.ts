@@ -13,7 +13,7 @@ export class UserService {
     snsId: string,
     name: string,
     icon: string,
-  ): Promise<string> {
+  ): Promise<User> {
     const user = new User({ snsId, name, icon })
     return await this.userRepository.create(user)
   }
@@ -30,7 +30,7 @@ export class UserService {
     id: string,
     name: string,
     icon: string,
-  ): Promise<string> {
+  ): Promise<User> {
     const user = await this.userRepository.getById(id)
 
     if (!user) {
@@ -42,7 +42,7 @@ export class UserService {
     return await this.userRepository.update(user)
   }
 
-  public async deleteUser(id: string): Promise<User> {
+  public async deleteUser(id: string): Promise<string> {
     return await this.userRepository.deleteById(id)
   }
 }

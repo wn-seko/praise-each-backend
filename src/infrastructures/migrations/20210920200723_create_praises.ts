@@ -8,8 +8,8 @@ export async function up(knex: Knex): Promise<void> {
       t.string('to').references('id').inTable('users').notNullable()
       t.string('message').notNullable()
       t.specificType('tags', 'text ARRAY').defaultTo('{}')
-      t.date('createdAt').notNullable()
-      t.date('updatedAt').notNullable()
+      t.timestamp('createdAt').notNullable()
+      t.timestamp('updatedAt').notNullable()
     })
   } else {
     console.warn('praises is exists.')

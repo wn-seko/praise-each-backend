@@ -45,7 +45,7 @@ export class PraiseService {
     to: string,
     message: string,
     tags: string[],
-  ): Promise<string> {
+  ): Promise<Praise> {
     await this.checkExistsUser(from)
     await this.checkExistsUser(to)
 
@@ -68,7 +68,7 @@ export class PraiseService {
     to?: string,
     message?: string,
     tags?: string[],
-  ): Promise<string> {
+  ): Promise<Praise> {
     const praise = await this.checkExistsPraise(id)
 
     praise.update({ from, to, message, tags })
@@ -76,7 +76,7 @@ export class PraiseService {
     return await this.praiseRepository.update(praise)
   }
 
-  public async deletePraise(id: string): Promise<Praise> {
+  public async deletePraise(id: string): Promise<string> {
     await this.checkExistsPraise(id)
 
     return await this.praiseRepository.deleteById(id)
