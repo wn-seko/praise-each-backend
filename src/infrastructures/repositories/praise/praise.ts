@@ -1,5 +1,7 @@
 import dayjs from 'dayjs'
 import { Praise, PraiseType } from '~/domains/entities/praise'
+import { PraiseLike } from '~/domains/entities/praiseLike'
+import { PraiseUpVote } from '~/domains/entities/praiseUpVote'
 import { PraiseRepository } from '~/domains/repositories/praise'
 import { knex } from '~/infrastructures/database'
 
@@ -18,11 +20,23 @@ interface DbPraiseType extends DbPraiseProps {
   up_votes: string[]
 }
 
+interface DbPraiseLike {
+  praise_id: string
+  user_id: string
+  created_at: string
+}
+
+interface DbPraiseUpVote {
+  praise_id: string
+  user_id: string
+  created_at: string
+}
+
 const resultToPraise = (result: DbPraiseType): Praise => {
   return new Praise({
     ...result,
-    likes: result.likes.filter((item) => !!item),
-    upVotes: result.up_votes.filter((item) => !!item),
+    likes: (result.likes || []).filter((item) => !!item),
+    upVotes: (result.up_votes || []).filter((item) => !!item),
     createdAt: dayjs(result.created_at),
     updatedAt: dayjs(result.updated_at),
   })
@@ -37,6 +51,60 @@ const praiseToDbType = (praise: PraiseType): DbPraiseProps => ({
   created_at: praise.createdAt.toISOString(),
   updated_at: praise.updatedAt.toISOString(),
 })
+
+const praiseLikeToDbType = (like: PraiseLike): DbPraiseLike => ({
+  praise_id: like.praiseId,
+  user_id: like.userId,
+  created_at: like.createdAt.toISOString(),
+})
+
+const praiseUpVoteToDbType = (upVote: PraiseUpVote): DbPraiseUpVote => ({
+  praise_id: upVote.praiseId,
+  user_id: upVote.userId,
+  created_at: upVote.createdAt.toISOString(),
+})
+
+const buildGetPraisesQuery = (whereOption: Partial<DbPraiseProps> = {}) => {
+  const baseQuery = knex.select('*').from('praises').where(whereOption).as('p')
+
+  const subQuery = knex
+    .select(['p.*', knex.raw('ARRAY_AGG(praise_likes.user_id) as likes')])
+    .from(baseQuery)
+    .leftJoin('praise_likes', 'p.id', 'praise_likes.praise_id')
+    .groupBy(
+      'p.id',
+      'p.from',
+      'p.to',
+      'p.message',
+      'p.tags',
+      'p.created_at',
+      'p.updated_at',
+      'praise_likes.praise_id',
+    )
+    .as('t1')
+
+  const mainQuery = knex
+    .select<DbPraiseType[]>([
+      't1.*',
+      knex.raw('ARRAY_AGG(praise_up_votes.user_id) as up_votes'),
+    ])
+    .from(subQuery)
+    .leftJoin('praise_up_votes', 't1.id', 'praise_up_votes.praise_id')
+    .groupBy(
+      't1.id',
+      't1.from',
+      't1.to',
+      't1.message',
+      't1.tags',
+      't1.likes',
+      't1.created_at',
+      't1.updated_at',
+      'praise_up_votes.praise_id',
+    )
+    .orderBy('t1.created_at', 'desc')
+
+  return mainQuery
+}
 
 export class SQLPraiseRepository implements PraiseRepository {
   async create(praise: Praise): Promise<Praise> {
@@ -54,35 +122,7 @@ export class SQLPraiseRepository implements PraiseRepository {
 
   async getList(): Promise<Praise[]> {
     try {
-      const subQuery = knex
-        .select([
-          'praises.*',
-          knex.raw('ARRAY_AGG(praise_likes.user_id) as likes'),
-        ])
-        .from('praises')
-        .leftJoin('praise_likes', 'praises.id', 'praise_likes.praise_id')
-        .groupBy('praises.id')
-        .as('t1')
-
-      const results = await knex
-        .select<DbPraiseType[]>([
-          't1.*',
-          knex.raw('ARRAY_AGG(praise_up_votes.user_id) as up_votes'),
-        ])
-        .from(subQuery)
-        .leftJoin('praise_up_votes', 't1.id', 'praise_up_votes.praise_id')
-        .groupBy(
-          't1.id',
-          't1.from',
-          't1.to',
-          't1.message',
-          't1.tags',
-          't1.likes',
-          't1.created_at',
-          't1.updated_at',
-        )
-        .orderBy('created_at', 'desc')
-
+      const results = await buildGetPraisesQuery()
       return results.map(resultToPraise)
     } catch (e) {
       console.error(e)
@@ -100,5 +140,39 @@ export class SQLPraiseRepository implements PraiseRepository {
   async deleteById(id: string): Promise<string> {
     await knex<PraiseType>('praises').where({ id }).del<PraiseType>()
     return id
+  }
+
+  async createLike(like: PraiseLike): Promise<Praise> {
+    await knex<DbPraiseLike>('praise_likes').insert(praiseLikeToDbType(like))
+
+    const result = await buildGetPraisesQuery({ id: like.praiseId }).first()
+    return resultToPraise(result)
+  }
+
+  async deleteLike(like: PraiseLike): Promise<Praise> {
+    await knex<DbPraiseLike>('praise_likes')
+      .where({ praise_id: like.praiseId, user_id: like.userId })
+      .delete()
+
+    const result = await buildGetPraisesQuery({ id: like.praiseId }).first()
+    return resultToPraise(result)
+  }
+
+  async createUpVote(upVote: PraiseUpVote): Promise<Praise> {
+    await knex<DbPraiseUpVote>('praise_up_votes').insert(
+      praiseUpVoteToDbType(upVote),
+    )
+
+    const result = await buildGetPraisesQuery({ id: upVote.praiseId }).first()
+    return resultToPraise(result)
+  }
+
+  async deleteUpVote(upVote: PraiseUpVote): Promise<Praise> {
+    await knex<DbPraiseUpVote>('praise_up_votes')
+      .where({ praise_id: upVote.praiseId, user_id: upVote.userId })
+      .delete()
+
+    const result = await buildGetPraisesQuery({ id: upVote.praiseId }).first()
+    return resultToPraise(result)
   }
 }

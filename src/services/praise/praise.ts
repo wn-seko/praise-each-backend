@@ -1,4 +1,6 @@
 import { Praise } from '~/domains/entities/praise'
+import { PraiseLike } from '~/domains/entities/praiseLike'
+import { PraiseUpVote } from '~/domains/entities/praiseUpVote'
 import { User } from '~/domains/entities/user'
 import { PraiseRepository } from '~/domains/repositories/praise'
 import { UserRepository } from '~/domains/repositories/user'
@@ -80,5 +82,41 @@ export class PraiseService {
     await this.checkExistsPraise(id)
 
     return await this.praiseRepository.deleteById(id)
+  }
+
+  public async createPraiseLike(id: string, userId: string): Promise<Praise> {
+    await this.checkExistsPraise(id)
+    await this.checkExistsUser(userId)
+
+    const praiseLike = new PraiseLike({ praiseId: id, userId })
+
+    return await this.praiseRepository.createLike(praiseLike)
+  }
+
+  public async deletePraiseLike(id: string, userId: string): Promise<Praise> {
+    await this.checkExistsPraise(id)
+    await this.checkExistsUser(userId)
+
+    const praiseLike = new PraiseLike({ praiseId: id, userId })
+
+    return await this.praiseRepository.deleteLike(praiseLike)
+  }
+
+  public async createPraiseUpVote(id: string, userId: string): Promise<Praise> {
+    await this.checkExistsPraise(id)
+    await this.checkExistsUser(userId)
+
+    const praiseUpVote = new PraiseUpVote({ praiseId: id, userId })
+
+    return await this.praiseRepository.createUpVote(praiseUpVote)
+  }
+
+  public async deletePraiseUpVote(id: string, userId: string): Promise<Praise> {
+    await this.checkExistsPraise(id)
+    await this.checkExistsUser(userId)
+
+    const praiseUpVote = new PraiseUpVote({ praiseId: id, userId })
+
+    return await this.praiseRepository.deleteUpVote(praiseUpVote)
   }
 }

@@ -1,4 +1,5 @@
 import dayjs, { Dayjs } from 'dayjs'
+import { checkValidUuidFormat } from '../validator'
 
 interface Props {
   praiseId: string
@@ -25,10 +26,15 @@ export class PraiseLike {
   public updatedAt: Dayjs
 
   constructor(praiseLike: PraiseLikeType | Props) {
-    this.praiseId = praiseLike.praiseId
-    this.userId = praiseLike.userId
+    this.praiseId = this.checkId(praiseLike.praiseId)
+    this.userId = this.checkId(praiseLike.userId)
     this.createdAt = 'createdAt' in praiseLike ? praiseLike.createdAt : dayjs()
     this.updatedAt = this.createdAt.clone()
+  }
+
+  private checkId(value: string): string {
+    checkValidUuidFormat(value)
+    return value
   }
 
   public toJSON(): PraiseLikeResponse {

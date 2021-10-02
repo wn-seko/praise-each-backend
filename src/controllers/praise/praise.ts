@@ -57,4 +57,44 @@ export class PraiseController {
     await this.praiseService.deletePraise(id)
     ctx.status = 200
   }
+
+  public async createPraiseLike(ctx: Koa.Context): Promise<void> {
+    const { id } = ctx.params
+    const userId = '00000000-0000-0000-0000-000000000000'
+    const praise = await this.praiseService.createPraiseLike(id, userId)
+
+    ctx.body = praise
+      ? await this.praisePresenter.praiseToResponse(praise)
+      : null
+  }
+
+  public async deletePraiseLike(ctx: Koa.Context): Promise<void> {
+    const { id } = ctx.params
+    const userId = '00000000-0000-0000-0000-000000000000'
+    const praise = await this.praiseService.deletePraiseLike(id, userId)
+
+    ctx.body = praise
+      ? await this.praisePresenter.praiseToResponse(praise)
+      : null
+  }
+
+  public async createPraiseUpVote(ctx: Koa.Context): Promise<void> {
+    const { id } = ctx.params
+    const userId = '00000000-0000-0000-0000-000000000000'
+    const praise = await this.praiseService.createPraiseUpVote(id, userId)
+
+    ctx.body = praise
+      ? await this.praisePresenter.praiseToResponse(praise)
+      : null
+  }
+
+  public async deletePraiseUpVote(ctx: Koa.Context): Promise<void> {
+    const { id } = ctx.params
+    const userId = '00000000-0000-0000-0000-000000000000'
+    const praise = await this.praiseService.deletePraiseUpVote(id, userId)
+
+    ctx.body = praise
+      ? await this.praisePresenter.praiseToResponse(praise)
+      : null
+  }
 }

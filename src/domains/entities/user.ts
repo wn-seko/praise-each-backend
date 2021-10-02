@@ -44,7 +44,6 @@ export class User {
   public toJSON() {
     return {
       id: this.id,
-      snsId: this.snsId,
       name: this.name,
       icon: this.icon,
       createdAt: this.createdAt.toISOString(),

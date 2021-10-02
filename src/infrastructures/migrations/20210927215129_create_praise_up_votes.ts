@@ -16,7 +16,6 @@ export async function up(knex: Knex): Promise<void> {
         .notNullable()
         .onUpdate('CASCADE')
       t.timestamp('created_at').notNullable()
-      t.timestamp('updated_at').notNullable()
       t.primary(['praise_id', 'user_id'])
     })
   } else {

@@ -11,25 +11,21 @@ export async function seed(knex: Knex): Promise<void> {
       praise_id: '10000000-0000-0000-0000-000000000001',
       user_id: '00000000-0000-0000-0000-000000000000',
       created_at: dayjs(),
-      updated_at: dayjs(),
     },
     {
       praise_id: '10000000-0000-0000-0000-000000000001',
       user_id: '00000000-0000-0000-0000-000000000001',
       created_at: dayjs(),
-      updated_at: dayjs(),
     },
     {
       praise_id: '10000000-0000-0000-0000-000000000001',
       user_id: '00000000-0000-0000-0000-000000000002',
       created_at: dayjs(),
-      updated_at: dayjs(),
     },
     {
       praise_id: '10000000-0000-0000-0000-000000000001',
       user_id: '00000000-0000-0000-0000-000000000003',
       created_at: dayjs(),
-      updated_at: dayjs(),
     },
   ])
 }

@@ -39,14 +39,18 @@ export class PraisePresenter {
     )
 
     const users = await this.userRepository.getByIds(userIds)
+
     const userHash = Object.fromEntries(
       users.map((user) => [user.id, user.toJSON()]),
     )
+
     return praises.map((praise) => this.mergeUser(praise, userHash))
   }
 
   public async praiseToResponse(praise: Praise): Promise<PraiseResponse> {
-    const userIds = Array.from(new Set([praise.from, praise.to]))
+    const userIds = Array.from(
+      new Set([praise.from, praise.to, ...praise.likes, ...praise.upVotes]),
+    )
 
     const users = await this.userRepository.getByIds(userIds)
     const userHash = Object.fromEntries(

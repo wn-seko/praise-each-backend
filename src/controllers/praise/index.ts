@@ -17,3 +17,16 @@ praiseRouter
   .post('/', praiseController.createPraise.bind(praiseController))
   .put('/:id', praiseController.updatePraise.bind(praiseController))
   .delete('/:id', praiseController.deletePraise.bind(praiseController))
+  .post('/:id/likes', praiseController.createPraiseLike.bind(praiseController))
+  .delete(
+    '/:id/likes',
+    praiseController.deletePraiseLike.bind(praiseController),
+  )
+  .post(
+    '/:id/up_votes',
+    praiseController.createPraiseUpVote.bind(praiseController),
+  )
+  .delete(
+    '/:id/up_votes',
+    praiseController.deletePraiseUpVote.bind(praiseController),
+  )
