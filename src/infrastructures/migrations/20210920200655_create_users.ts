@@ -4,11 +4,11 @@ export async function up(knex: Knex): Promise<void> {
   if (!(await knex.schema.hasTable('users'))) {
     return knex.schema.createTable('users', (t) => {
       t.string('id').primary()
-      t.string('snsId').notNullable()
+      t.string('sns_id').notNullable()
       t.string('name').notNullable()
       t.string('icon').notNullable()
-      t.timestamp('createdAt').notNullable()
-      t.timestamp('updatedAt').notNullable()
+      t.timestamp('created_at').notNullable()
+      t.timestamp('updated_at').notNullable()
     })
   } else {
     console.warn('users is exists.')

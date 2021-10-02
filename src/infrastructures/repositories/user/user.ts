@@ -1,11 +1,21 @@
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 import { User, UserType } from '~/domains/entities/user'
 import { UserRepository } from '~/domains/repositories/user'
 import { knex } from '~/infrastructures/database'
 
-const resultToUser = (result: UserType): User => {
+interface DbUserResult {
+  id: string
+  sns_id: string
+  name: string
+  icon: string
+  createdAt: Dayjs
+  updatedAt: Dayjs
+}
+
+const resultToUser = (result: DbUserResult): User => {
   return new User({
     ...result,
+    snsId: result.sns_id,
     createdAt: dayjs(result.createdAt),
     updatedAt: dayjs(result.updatedAt),
   })
@@ -13,27 +23,27 @@ const resultToUser = (result: UserType): User => {
 
 export class SQLUserRepository implements UserRepository {
   async create(user: User): Promise<User> {
-    const results = await knex<UserType>('users').insert(user, '*')
+    const results = await knex<DbUserResult>('users').insert(user, '*')
     return resultToUser(results[0])
   }
 
   async getById(id: string): Promise<User | undefined> {
-    const result = await knex<UserType>('users').where({ id }).first('*')
+    const result = await knex<DbUserResult>('users').where({ id }).first('*')
     return result ? resultToUser(result) : undefined
   }
 
   async getByIds(ids: string[]): Promise<User[]> {
-    const results = await knex<UserType>('users').whereIn('id', ids)
+    const results = await knex<DbUserResult>('users').whereIn('id', ids)
     return results.map(resultToUser)
   }
 
   async getList(): Promise<User[]> {
-    const results = await knex<UserType>('users')
+    const results = await knex<DbUserResult>('users')
     return results.map(resultToUser)
   }
 
   async search(word: string): Promise<User[]> {
-    const results = await knex<UserType>('users').where(
+    const results = await knex<DbUserResult>('users').where(
       'name',
       'ilike',
       `%${word}%`,
@@ -42,7 +52,10 @@ export class SQLUserRepository implements UserRepository {
   }
 
   async update(user: User): Promise<User> {
-    return await knex<UserType>('users').where('id', user.id).update(user)
+    const result = await knex<DbUserResult>('users')
+      .where('id', user.id)
+      .update(user, '*')
+    return resultToUser(result[0])
   }
 
   async deleteById(id: string): Promise<string> {

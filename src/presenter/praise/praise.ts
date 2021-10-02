@@ -17,6 +17,8 @@ export class PraisePresenter {
       ...praise.toJSON(),
       from: userHashMap[praise.from],
       to: userHashMap[praise.to],
+      likes: praise.likes.map((userId) => userHashMap[userId]),
+      upVotes: praise.upVotes.map((userId) => userHashMap[userId]),
     }
   }
 
@@ -25,6 +27,14 @@ export class PraisePresenter {
       new Set([
         ...praises.map((praise) => praise.from),
         ...praises.map((praise) => praise.to),
+        ...praises.reduce(
+          (memo, praise) => memo.concat(praise.likes),
+          [] as string[],
+        ),
+        ...praises.reduce(
+          (memo, praise) => memo.concat(praise.upVotes),
+          [] as string[],
+        ),
       ]),
     )
 

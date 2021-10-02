@@ -44,6 +44,10 @@ export const handler = (): Middleware => {
           ? error
           : createSystemError(error as Error)
 
+      if (!(error instanceof ApplicationError)) {
+        console.error(error)
+      }
+
       const debug = env.DEBUG_RESPONSE_ENABLED
         ? {
             trace: appError.stack,

@@ -15,14 +15,21 @@ interface Props {
   tags: string[]
 }
 
-export type PraiseType = Props & SystemInfo
+interface ReadonlyProps extends SystemInfo {
+  likes: string[]
+  upVotes: string[]
+}
+
+export type PraiseType = Props & ReadonlyProps
 
 export type PraiseResponse = Omit<
   PraiseType,
-  'from' | 'to' | 'createdAt' | 'updatedAt'
+  'from' | 'to' | 'likes' | 'upVotes' | 'createdAt' | 'updatedAt'
 > & {
   from: UserResponse
   to: UserResponse
+  likes: UserResponse[]
+  upVotes: UserResponse[]
   createdAt: string
   updatedAt: string
 }
@@ -33,16 +40,20 @@ export class Praise {
   public to: string
   public message: string
   public tags: string[]
+  public likes: string[]
+  public upVotes: string[]
   public createdAt: Dayjs
   public updatedAt: Dayjs
 
-  constructor(praise: PraiseType | Props) {
-    this.id = 'id' in praise ? this.checkId(praise.id) : uuid()
+  constructor(praise: Props & Partial<ReadonlyProps>) {
+    this.id = praise.id ? this.checkId(praise.id) : uuid()
     this.from = this.checkUserId(praise.from)
     this.to = this.checkUserId(praise.to)
     this.message = this.checkMessage(praise.message)
     this.tags = this.checkTags(praise.tags)
-    this.createdAt = 'createdAt' in praise ? praise.createdAt : dayjs()
+    this.likes = praise.likes ?? []
+    this.upVotes = praise.upVotes ?? []
+    this.createdAt = praise?.createdAt ?? dayjs()
     this.updatedAt = this.createdAt.clone()
   }
 
@@ -85,6 +96,8 @@ export class Praise {
       to: this.to,
       message: this.message,
       tags: this.tags,
+      likes: this.likes,
+      upVotes: this.upVotes,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     }
