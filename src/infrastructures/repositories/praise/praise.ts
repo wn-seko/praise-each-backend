@@ -1,5 +1,9 @@
 import dayjs from 'dayjs'
-import { Praise, PraiseType } from '~/domains/entities/praise'
+import {
+  Praise,
+  PraiseQueryParams,
+  PraiseType,
+} from '~/domains/entities/praise'
 import { PraiseLike } from '~/domains/entities/praiseLike'
 import { PraiseUpVote } from '~/domains/entities/praiseUpVote'
 import { PraiseRepository } from '~/domains/repositories/praise'
@@ -31,6 +35,9 @@ interface DbPraiseUpVote {
   user_id: string
   created_at: string
 }
+
+const sanitizeQuery = (queryParams: PraiseQueryParams) =>
+  Object.fromEntries(Object.entries(queryParams).filter(([, v]) => v != null))
 
 const resultToPraise = (result: DbPraiseType): Praise => {
   return new Praise({
@@ -64,8 +71,12 @@ const praiseUpVoteToDbType = (upVote: PraiseUpVote): DbPraiseUpVote => ({
   created_at: upVote.createdAt.toISOString(),
 })
 
-const buildGetPraisesQuery = (whereOption: Partial<DbPraiseProps> = {}) => {
-  const baseQuery = knex.select('*').from('praises').where(whereOption).as('p')
+const buildGetPraisesQuery = (
+  whereOptions: Partial<DbPraiseProps> = {},
+  offset?: number,
+  limit?: number,
+) => {
+  const baseQuery = knex.select('*').from('praises').where(whereOptions).as('p')
 
   const subQuery = knex
     .select(['p.*', knex.raw('ARRAY_AGG(praise_likes.user_id) as likes')])
@@ -83,7 +94,7 @@ const buildGetPraisesQuery = (whereOption: Partial<DbPraiseProps> = {}) => {
     )
     .as('t1')
 
-  const mainQuery = knex
+  let mainQuery = knex
     .select<DbPraiseType[]>([
       't1.*',
       knex.raw('ARRAY_AGG(praise_up_votes.user_id) as up_votes'),
@@ -103,6 +114,14 @@ const buildGetPraisesQuery = (whereOption: Partial<DbPraiseProps> = {}) => {
     )
     .orderBy('t1.created_at', 'desc')
 
+  if (offset) {
+    mainQuery = mainQuery.offset(offset)
+  }
+
+  if (limit) {
+    mainQuery = mainQuery.limit(limit)
+  }
+
   return mainQuery
 }
 
@@ -120,9 +139,11 @@ export class SQLPraiseRepository implements PraiseRepository {
     return result ? resultToPraise(result) : undefined
   }
 
-  async getList(): Promise<Praise[]> {
+  async getList(queryParams: PraiseQueryParams): Promise<Praise[]> {
     try {
-      const results = await buildGetPraisesQuery()
+      const sanitizedWhereOptions = sanitizeQuery(queryParams)
+      const { offset, limit, ...whereOptions } = sanitizedWhereOptions
+      const results = await buildGetPraisesQuery(whereOptions, offset, limit)
       return results.map(resultToPraise)
     } catch (e) {
       console.error(e)

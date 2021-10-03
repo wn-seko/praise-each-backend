@@ -1,4 +1,4 @@
-import { Praise } from '~/domains/entities/praise'
+import { Praise, PraiseQueryParams } from '~/domains/entities/praise'
 import { PraiseLike } from '~/domains/entities/praiseLike'
 import { PraiseUpVote } from '~/domains/entities/praiseUpVote'
 import { User } from '~/domains/entities/user'
@@ -56,8 +56,8 @@ export class PraiseService {
     return await this.praiseRepository.create(praise)
   }
 
-  public async listPraises(): Promise<Praise[]> {
-    return await this.praiseRepository.getList()
+  public async listPraises(queryParams: PraiseQueryParams): Promise<Praise[]> {
+    return await this.praiseRepository.getList(queryParams)
   }
 
   public async getPraise(id: string): Promise<Praise | undefined> {

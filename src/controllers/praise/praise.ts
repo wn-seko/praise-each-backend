@@ -15,7 +15,13 @@ export class PraiseController {
   }
 
   public async listPraises(ctx: Koa.Context): Promise<void> {
-    const praises = await this.praiseService.listPraises()
+    const { from, to, offset = 0, limit = 20 } = ctx.request.query || {}
+    const praises = await this.praiseService.listPraises({
+      from: typeof from === 'object' ? from[0] : from,
+      to: typeof to === 'object' ? to[0] : to,
+      offset: Number(offset),
+      limit: Number(limit),
+    })
     ctx.body = await this.praisePresenter.praisesToResponse(praises)
   }
 
@@ -27,7 +33,7 @@ export class PraiseController {
   }
 
   public async createPraise(ctx: Koa.Context): Promise<void> {
-    const { from, to, message, tags } = ctx.request.body
+    const { from, to, message, tags } = ctx.request.body || {}
     const praise = await this.praiseService.createPraise(
       from || '00000000-0000-0000-0000-000000000000',
       to,
@@ -40,7 +46,7 @@ export class PraiseController {
 
   public async updatePraise(ctx: Koa.Context): Promise<void> {
     const { id } = ctx.params
-    const { from, to, message, tags } = ctx.request.body
+    const { from, to, message, tags } = ctx.request.body || {}
     const praise = await this.praiseService.updatePraise(
       id,
       from,

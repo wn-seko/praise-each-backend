@@ -34,6 +34,13 @@ export type PraiseResponse = Omit<
   updatedAt: string
 }
 
+export interface PraiseQueryParams {
+  from?: string
+  to?: string
+  offset: number
+  limit: number
+}
+
 export class Praise {
   public readonly id: string
   public from: string
