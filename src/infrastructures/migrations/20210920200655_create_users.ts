@@ -9,6 +9,8 @@ export async function up(knex: Knex): Promise<void> {
       t.string('icon').notNullable()
       t.timestamp('created_at').notNullable()
       t.timestamp('updated_at').notNullable()
+      t.index('sns_id', 'users_sns_id_idx')
+      t.index('name', 'users_name_idx')
     })
   } else {
     console.warn('users is exists.')
