@@ -60,7 +60,6 @@ const tsConfig = {
       'error',
       {
         types: {
-          // 闇の魔術に対する防衛術
           '{}': false,
         },
       },
