@@ -7,9 +7,11 @@ COPY src ./src
 
 RUN yarn && yarn build
 
-FROM alpine:3.12.0
+FROM alpine:3.13.0
 
-# # 必要なファイルを移動させる
+RUN apk add --no-cache nodejs=14.17.6-r0
+
+# 必要なファイルを移動させる
 WORKDIR /opt/drive
 COPY --from=build-stage /opt/drive/dist/server.js ./
 EXPOSE 3000
