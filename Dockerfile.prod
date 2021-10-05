@@ -2,8 +2,7 @@ FROM node:14.4.0-stretch AS build-stage
 
 # buildする
 WORKDIR /opt/drive
-COPY package.json webpack.config.js tsconfig.json ./
-COPY patches ./patches
+COPY package.json yarn.lock webpack.config.js webpack.config.build.js tsconfig.build.json ./
 COPY src ./src
 
 RUN yarn && yarn build
