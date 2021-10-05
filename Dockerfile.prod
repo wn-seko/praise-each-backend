@@ -12,7 +12,6 @@ FROM alpine:3.12.0
 # # 必要なファイルを移動させる
 WORKDIR /opt/drive
 COPY --from=build-stage /opt/drive/dist/server.js ./
-RUN apk add npm=12.17.0-r0
 EXPOSE 3000
 
 CMD [ "node", "server.js" ]
