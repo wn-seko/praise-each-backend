@@ -1,0 +1,21 @@
+{
+  "name": "praise-each-backend",
+  "license": "MIT",
+  "scripts": {
+    "knex": "yarn ts-node --transpile-only ./node_modules/.bin/knex",
+    "install_and_knex": "yarn && yarn knex"
+  },
+  "dependencies": {
+    "@types/node": "^14.0.11",
+    "@types/uuid": "^8.3.1",
+    "dayjs": "^1.10.6",
+    "dotenv": "^8.2.0",
+    "knex": "^0.21.1",
+    "pg": "^8.2.1",
+    "reflect-metadata": "^0.1.13",
+    "ts-node": "^8.10.2",
+    "ts-loader": "^7.0.5",
+    "typescript": "^4.4.2",
+    "uuid": "^8.3.2"
+  }
+}

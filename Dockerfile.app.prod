@@ -1,6 +1,5 @@
 FROM node:14.4.0-stretch AS build-stage
 
-# buildする
 WORKDIR /opt/drive
 COPY package.json yarn.lock webpack.config.js webpack.config.build.js tsconfig.build.json ./
 COPY src ./src
@@ -11,7 +10,6 @@ FROM alpine:3.13.0
 
 RUN apk add --no-cache nodejs=14.17.6-r0
 
-# 必要なファイルを移動させる
 WORKDIR /opt/drive
 COPY --from=build-stage /opt/drive/dist/server.js ./
 EXPOSE 3000

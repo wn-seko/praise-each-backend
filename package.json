@@ -14,7 +14,6 @@
     "build": "npm-run-all clean webpack:build",
     "lint": "eslint --ext .js,.json,.ts,.tsx --ignore-path .eslintignore .",
     "lint:fix": "yarn lint --fix",
-    "knex": "ts-node -r dotenv/config ./node_modules/.bin/knex",
     "test": "jest"
   },
   "repository": {
