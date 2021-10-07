@@ -35,7 +35,14 @@ const makeValidator = <ConvertedValue = InitialConvertedValue>(
 export const toNodeEnv = makeValidator<NodeEnv>(
   (v) => v === 'development' || v === 'production' || v === 'test',
 )
+
 export const toString = makeValidator<string>((v) => typeof v === 'string')
+
+export const toStringOrUndefined = makeValidator(
+  (v) => typeof v === 'string' || typeof v === 'undefined',
+  (v) => (typeof v === 'string' ? v : undefined),
+)
+
 export const toNumberOrUndefined = makeValidator<number | undefined>(
   (v) => typeof v === 'undefined' || !isNaN(Number(v)),
   (v) => (typeof v === 'undefined' ? undefined : Number(v)),

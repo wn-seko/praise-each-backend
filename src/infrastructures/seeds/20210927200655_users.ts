@@ -9,7 +9,6 @@ export async function seed(knex: Knex): Promise<void> {
   await knex('users').insert([
     {
       id: '00000000-0000-0000-0000-000000000000',
-      sns_id: 'dummy1',
       name: 'ME',
       icon: 'https://react.semantic-ui.com/images/avatar/large/steve.jpg',
       created_at: dayjs(),
@@ -17,7 +16,6 @@ export async function seed(knex: Knex): Promise<void> {
     },
     {
       id: '00000000-0000-0000-0000-000000000001',
-      sns_id: 'dummy1',
       name: 'User-1',
       icon: 'https://react.semantic-ui.com/images/avatar/large/molly.png',
       created_at: dayjs(),
@@ -25,7 +23,6 @@ export async function seed(knex: Knex): Promise<void> {
     },
     {
       id: '00000000-0000-0000-0000-000000000002',
-      sns_id: 'dummy2',
       name: 'User-2',
       icon: 'https://react.semantic-ui.com/images/avatar/large/jenny.jpg',
       created_at: dayjs(),
@@ -33,7 +30,6 @@ export async function seed(knex: Knex): Promise<void> {
     },
     {
       id: '00000000-0000-0000-0000-000000000003',
-      sns_id: 'dummy3',
       name: 'User-3',
       icon: 'https://react.semantic-ui.com/images/avatar/large/steve.jpg',
       created_at: dayjs(),

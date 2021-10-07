@@ -29,13 +29,6 @@ export class UserController {
     ctx.body = user ? this.userPresenter.userToResponse(user) : null
   }
 
-  public async createUser(ctx: Koa.Context): Promise<void> {
-    const { snsId, name, icon } = ctx.request.body
-    const user = await this.userService.createUser(snsId, name, icon)
-    ctx.status = 201
-    ctx.body = user ? this.userPresenter.userToResponse(user) : null
-  }
-
   public async updateUser(ctx: Koa.Context): Promise<void> {
     const { id } = ctx.params
     const { name, icon } = ctx.request.body

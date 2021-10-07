@@ -14,6 +14,5 @@ export const userRouter = new Router({ prefix: '/users' })
 userRouter
   .get('/', userController.listUsers.bind(userController))
   .get('/:id', userController.getUser.bind(userController))
-  .post('/', userController.createUser.bind(userController))
   .put('/:id', userController.updateUser.bind(userController))
   .delete('/:id', userController.deleteUser.bind(userController))

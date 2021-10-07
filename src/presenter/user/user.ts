@@ -6,8 +6,6 @@ export class UserPresenter {
   }
 
   public userToResponse(user: User): UserResponse {
-    return Object.fromEntries(
-      Object.entries(user.toJSON()).filter(([key]) => key !== 'snsId'),
-    ) as UserResponse
+    return Object.fromEntries(Object.entries(user.toJSON())) as UserResponse
   }
 }

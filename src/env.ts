@@ -1,5 +1,10 @@
 import { Environment } from './utils/env/environment'
-import { toNodeEnv, toString, toNumberOrUndefined } from './utils/env/validator'
+import {
+  toNodeEnv,
+  toString,
+  toNumberOrUndefined,
+  toStringOrUndefined,
+} from './utils/env/validator'
 
 export type EnvironmentValidators = {
   [k in keyof Environment]: (key: string) => Environment[k]
@@ -7,6 +12,7 @@ export type EnvironmentValidators = {
 
 export const envValidators: EnvironmentValidators = {
   NODE_ENV: toNodeEnv,
+  APPLICATION_SECRET: toString,
   DB_HOST: toString,
   DB_PORT: (key) => toNumberOrUndefined(key) ?? 5432,
   DB_NAME: toString,
@@ -15,6 +21,9 @@ export const envValidators: EnvironmentValidators = {
   DB_POOL_MIN: (key) => toNumberOrUndefined(key) ?? 2,
   DB_POOL_MAX: (key) => toNumberOrUndefined(key) ?? 10,
   DB_CONNECTION_TIMEOUT: (key) => toNumberOrUndefined(key) ?? 60000,
+  OAUTH_GITHUB_CLIENT_ID: (key) => toStringOrUndefined(key) ?? '',
+  OAUTH_GITHUB_CLIENT_SECRET: (key) => toStringOrUndefined(key) ?? '',
+  OAUTH_GITHUB_CALLBACK_URL: (key) => toStringOrUndefined(key) ?? '',
   // eslint-disable-next-line no-process-env
   DEBUG_RESPONSE_ENABLED: () => process.env.NODE_ENV === 'development',
 }

@@ -29,22 +29,37 @@ const getResponseStatus = (errorCode: ErrorCode): number => {
   }
 }
 
+const createApplicationError = (error: unknown) => {
+  if (
+    typeof error === 'object' &&
+    error != null &&
+    (error as { status: number })?.status === 401
+  ) {
+    return new ApplicationError(
+      errorCode.AUTHENTICATION_ERROR,
+      'Authentication error',
+    )
+  }
+
+  return error instanceof ApplicationError
+    ? error
+    : createSystemError(error as Error)
+}
+
 export const handler = (): Middleware => {
   return async (ctx: Context, next: Next) => {
     try {
       await next()
+
       if (ctx.status === 404) {
         ctx.throw(
           new ApplicationError(errorCode.NOT_FOUND, 'resource not found.'),
         )
       }
     } catch (error) {
-      const appError =
-        error instanceof ApplicationError
-          ? error
-          : createSystemError(error as Error)
+      const appError = createApplicationError(error)
 
-      if (!(error instanceof ApplicationError)) {
+      if (appError.code === errorCode.SYSTEM_ERROR) {
         console.error(error)
       }
 

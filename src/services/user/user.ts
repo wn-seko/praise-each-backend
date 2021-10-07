@@ -9,15 +9,6 @@ export class UserService {
     this.userRepository = userRepository
   }
 
-  public async createUser(
-    snsId: string,
-    name: string,
-    icon: string,
-  ): Promise<User> {
-    const user = new User({ snsId, name, icon })
-    return await this.userRepository.create(user)
-  }
-
   public async listUsers(): Promise<User[]> {
     return await this.userRepository.getList()
   }

@@ -1,38 +1,54 @@
 import { v4 as uuid } from 'uuid'
 import dayjs, { Dayjs } from 'dayjs'
 import { SystemInfo } from '~/utils/types'
+import {
+  checkMinLength,
+  checkMaxLength,
+  checkValidUuidFormat,
+} from '../validator'
 
 interface Props {
-  snsId: string
   name: string
   icon: string
 }
 
 export type UserType = Props & SystemInfo
 
-export type UserResponse = Omit<
-  UserType,
-  'snsId' | 'createdAt' | 'updatedAt'
-> & {
+export type UserResponse = Omit<UserType, 'createdAt' | 'updatedAt'> & {
   createdAt: string
   updatedAt: string
 }
 
 export class User {
   public readonly id: string
-  public snsId: string
   public name: string
   public icon: string
   public createdAt: Dayjs
   public updatedAt: Dayjs
 
   constructor(user: UserType | Props) {
-    this.id = 'id' in user ? user.id : uuid()
-    this.snsId = user.snsId
-    this.name = user.name
-    this.icon = user.icon
+    this.id = 'id' in user ? this.checkId(user.id) : uuid()
+    this.name = this.checkName(user.name)
+    this.icon = this.checkIcon(user.icon)
     this.createdAt = 'createdAt' in user ? user.createdAt : dayjs()
     this.updatedAt = this.createdAt.clone()
+  }
+
+  private checkId(value: string): string {
+    checkValidUuidFormat(value)
+    return value
+  }
+
+  private checkName(value: string): string {
+    checkMinLength(value, 1)
+    checkMaxLength(value, 100)
+    return value
+  }
+
+  private checkIcon(value: string): string {
+    checkMinLength(value, 1)
+    checkMaxLength(value, 5000)
+    return value
   }
 
   public update(props: Partial<Props>) {

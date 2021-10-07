@@ -1,49 +1,69 @@
-import dayjs, { Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
 import { User, UserType } from '~/domains/entities/user'
 import { UserRepository } from '~/domains/repositories/user'
 import { knex } from '~/infrastructures/database'
 
-interface DbUserResult {
+interface DbUserProps {
   id: string
-  sns_id: string
   name: string
   icon: string
-  createdAt: Dayjs
-  updatedAt: Dayjs
+  created_at: string
+  updated_at: string
 }
 
-const resultToUser = (result: DbUserResult): User => {
+const resultToUser = (result: DbUserProps): User => {
   return new User({
     ...result,
-    snsId: result.sns_id,
-    createdAt: dayjs(result.createdAt),
-    updatedAt: dayjs(result.updatedAt),
+    createdAt: dayjs(result.created_at),
+    updatedAt: dayjs(result.updated_at),
   })
 }
 
+const userToDbType = (user: User): DbUserProps => ({
+  id: user.id,
+  name: user.name,
+  icon: user.icon,
+  created_at: user.createdAt.toISOString(),
+  updated_at: user.updatedAt.toISOString(),
+})
+
 export class SQLUserRepository implements UserRepository {
   async create(user: User): Promise<User> {
-    const results = await knex<DbUserResult>('users').insert(user, '*')
+    const results = await knex<DbUserProps>('users').insert(
+      userToDbType(user),
+      '*',
+    )
     return resultToUser(results[0])
   }
 
   async getById(id: string): Promise<User | undefined> {
-    const result = await knex<DbUserResult>('users').where({ id }).first('*')
+    const result = await knex<DbUserProps>('users').where({ id }).first('*')
     return result ? resultToUser(result) : undefined
   }
 
   async getByIds(ids: string[]): Promise<User[]> {
-    const results = await knex<DbUserResult>('users').whereIn('id', ids)
+    const results = await knex<DbUserProps>('users').whereIn('id', ids)
     return results.map(resultToUser)
   }
 
+  async getByOAuth(
+    oauthId: string,
+    oauthType: string,
+  ): Promise<User | undefined> {
+    const result = await knex<DbUserProps>('users')
+      .innerJoin('user_credentials', 'user_credentials.user_id', 'users.id')
+      .where({ oauth_id: oauthId, oauth_type: oauthType })
+      .first('users.*')
+    return result ? resultToUser(result) : undefined
+  }
+
   async getList(): Promise<User[]> {
-    const results = await knex<DbUserResult>('users')
+    const results = await knex<DbUserProps>('users')
     return results.map(resultToUser)
   }
 
   async search(word: string): Promise<User[]> {
-    const results = await knex<DbUserResult>('users').where(
+    const results = await knex<DbUserProps>('users').where(
       'name',
       'ilike',
       `%${word}%`,
@@ -52,9 +72,9 @@ export class SQLUserRepository implements UserRepository {
   }
 
   async update(user: User): Promise<User> {
-    const result = await knex<DbUserResult>('users')
+    const result = await knex<DbUserProps>('users')
       .where('id', user.id)
-      .update(user, '*')
+      .update(userToDbType(user), '*')
     return resultToUser(result[0])
   }
 
