@@ -1,5 +1,5 @@
 import { Middleware, Context, Next } from 'koa'
-import { env } from './env'
+import { env } from '~/env'
 import { ApplicationError, ErrorCode, errorCode } from '~/services/errors'
 
 const createSystemError = (error: Error): ApplicationError =>

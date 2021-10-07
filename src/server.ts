@@ -3,8 +3,9 @@ import Koa from 'koa'
 import bodyParser from 'koa-bodyparser'
 import jwt from 'koa-jwt'
 import { env } from '~/env'
-import { handler } from '~/handler'
-import { routers } from '~/routes'
+import { authParser } from '~/middlewares/context'
+import { handler } from '~/middlewares/handler'
+import { routers } from '~/middlewares/routes'
 
 const app = new Koa()
 
@@ -18,6 +19,8 @@ app.use(handler())
 app.use(
   jwt({ secret: env.APPLICATION_SECRET }).unless({ path: [/^\/oauth\//] }),
 )
+
+app.use(authParser())
 
 // parser
 app.use(bodyParser())

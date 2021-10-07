@@ -1,4 +1,4 @@
-import Koa from 'koa'
+import { CustomContext } from '~/middlewares/context'
 import { PraisePresenter } from '~/presenter/praise'
 import { PraiseService } from '~/services/praise'
 
@@ -14,7 +14,7 @@ export class PraiseController {
     this.praisePresenter = praisePresenter
   }
 
-  public async listPraises(ctx: Koa.Context): Promise<void> {
+  public async listPraises(ctx: CustomContext): Promise<void> {
     const { from, to, offset = 0, limit = 20 } = ctx.request.query || {}
     const praises = await this.praiseService.listPraises({
       from: typeof from === 'object' ? from[0] : from,
@@ -25,17 +25,18 @@ export class PraiseController {
     ctx.body = await this.praisePresenter.praisesToResponse(praises)
   }
 
-  public async getPraise(ctx: Koa.Context): Promise<void> {
+  public async getPraise(ctx: CustomContext): Promise<void> {
     const praise = await this.praiseService.getPraise(ctx.params['id'])
     ctx.body = praise
       ? await this.praisePresenter.praiseToResponse(praise)
       : null
   }
 
-  public async createPraise(ctx: Koa.Context): Promise<void> {
-    const { from, to, message, tags } = ctx.request.body || {}
+  public async createPraise(ctx: CustomContext): Promise<void> {
+    const { to, message, tags } = ctx.request.body || {}
+    const userId = ctx.authUserId
     const praise = await this.praiseService.createPraise(
-      from || '00000000-0000-0000-0000-000000000000',
+      userId,
       to,
       message,
       tags,
@@ -44,12 +45,13 @@ export class PraiseController {
     ctx.body = await this.praisePresenter.praiseToResponse(praise)
   }
 
-  public async updatePraise(ctx: Koa.Context): Promise<void> {
+  public async updatePraise(ctx: CustomContext): Promise<void> {
     const { id } = ctx.params
-    const { from, to, message, tags } = ctx.request.body || {}
+    const { to, message, tags } = ctx.request.body || {}
+    const userId = ctx.authUserId
     const praise = await this.praiseService.updatePraise(
       id,
-      from,
+      userId,
       to,
       message,
       tags,
@@ -58,15 +60,15 @@ export class PraiseController {
     ctx.body = await this.praisePresenter.praiseToResponse(praise)
   }
 
-  public async deletePraise(ctx: Koa.Context): Promise<void> {
+  public async deletePraise(ctx: CustomContext): Promise<void> {
     const { id } = ctx.params
     await this.praiseService.deletePraise(id)
     ctx.status = 200
   }
 
-  public async createPraiseLike(ctx: Koa.Context): Promise<void> {
+  public async createPraiseLike(ctx: CustomContext): Promise<void> {
     const { id } = ctx.params
-    const userId = '00000000-0000-0000-0000-000000000000'
+    const userId = ctx.authUserId
     const praise = await this.praiseService.createPraiseLike(id, userId)
 
     ctx.body = praise
@@ -74,9 +76,9 @@ export class PraiseController {
       : null
   }
 
-  public async deletePraiseLike(ctx: Koa.Context): Promise<void> {
+  public async deletePraiseLike(ctx: CustomContext): Promise<void> {
     const { id } = ctx.params
-    const userId = '00000000-0000-0000-0000-000000000000'
+    const userId = ctx.authUserId
     const praise = await this.praiseService.deletePraiseLike(id, userId)
 
     ctx.body = praise
@@ -84,9 +86,9 @@ export class PraiseController {
       : null
   }
 
-  public async createPraiseUpVote(ctx: Koa.Context): Promise<void> {
+  public async createPraiseUpVote(ctx: CustomContext): Promise<void> {
     const { id } = ctx.params
-    const userId = '00000000-0000-0000-0000-000000000000'
+    const userId = ctx.authUserId
     const praise = await this.praiseService.createPraiseUpVote(id, userId)
 
     ctx.body = praise
@@ -94,9 +96,9 @@ export class PraiseController {
       : null
   }
 
-  public async deletePraiseUpVote(ctx: Koa.Context): Promise<void> {
+  public async deletePraiseUpVote(ctx: CustomContext): Promise<void> {
     const { id } = ctx.params
-    const userId = '00000000-0000-0000-0000-000000000000'
+    const userId = ctx.authUserId
     const praise = await this.praiseService.deletePraiseUpVote(id, userId)
 
     ctx.body = praise

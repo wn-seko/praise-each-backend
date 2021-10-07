@@ -1,5 +1,5 @@
 import Koa from 'koa'
-import { oauthRouter } from './controllers/oauth'
+import { oauthRouter } from '~/controllers/oauth'
 import { praiseRouter } from '~/controllers/praise'
 import { rootRouter } from '~/controllers/root'
 import { userRouter } from '~/controllers/user'

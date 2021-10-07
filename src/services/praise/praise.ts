@@ -51,6 +51,13 @@ export class PraiseService {
     await this.checkExistsUser(from)
     await this.checkExistsUser(to)
 
+    if (from === to) {
+      throw new ApplicationError(
+        errorCode.INVALID_PARAMETER,
+        'Posting to yourself is not allowed.',
+      )
+    }
+
     const praise = new Praise({ from, to, message, tags })
 
     return await this.praiseRepository.create(praise)

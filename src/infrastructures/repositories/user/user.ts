@@ -50,9 +50,10 @@ export class SQLUserRepository implements UserRepository {
     oauthId: string,
     oauthType: string,
   ): Promise<User | undefined> {
-    const result = await knex<DbUserProps>('users')
-      .innerJoin('user_credentials', 'user_credentials.user_id', 'users.id')
+    const result = await knex<DbUserProps>()
+      .from('users')
       .where({ oauth_id: oauthId, oauth_type: oauthType })
+      .innerJoin('user_credentials', 'user_credentials.user_id', 'users.id')
       .first('users.*')
     return result ? resultToUser(result) : undefined
   }
