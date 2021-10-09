@@ -149,6 +149,8 @@ export class OAuthService {
       throw new ApplicationError(
         errorCode.AUTHENTICATION_ERROR,
         'Github login failure.',
+        { code },
+        error as Error,
       )
     }
   }
