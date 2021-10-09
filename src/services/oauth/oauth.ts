@@ -151,7 +151,5 @@ export class OAuthService {
         'Github login failure.',
       )
     }
-
-    return { token: '' }
   }
 }

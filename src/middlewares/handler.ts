@@ -37,7 +37,7 @@ const createApplicationError = (error: unknown) => {
   ) {
     return new ApplicationError(
       errorCode.AUTHENTICATION_ERROR,
-      'Authentication error',
+      'Login token is invalid or expired.',
     )
   }
 
@@ -80,6 +80,7 @@ export const handler = (): Middleware => {
         payload: null,
         error: {
           code: appError.code,
+          message: appError.message,
           params: appError.params,
         },
         debug,
