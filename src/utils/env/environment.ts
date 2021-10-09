@@ -14,5 +14,6 @@ export type Environment = {
   OAUTH_GITHUB_CLIENT_ID: string
   OAUTH_GITHUB_CLIENT_SECRET: string
   OAUTH_GITHUB_CALLBACK_URL: string
+  OAUTH_GITHUB_DOMAIN: string
   DEBUG_RESPONSE_ENABLED: boolean
 }

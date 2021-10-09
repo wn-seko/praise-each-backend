@@ -122,7 +122,7 @@ export class OAuthService {
       // Fetch Github Access Token
       const { body: accessTokenResult } = await this.post<{
         access_token: string
-      }>('https://github.com/login/oauth/access_token', {
+      }>(`https://${env.OAUTH_GITHUB_DOMAIN}/login/oauth/access_token`, {
         client_id: env.OAUTH_GITHUB_CLIENT_ID,
         client_secret: env.OAUTH_GITHUB_CLIENT_SECRET,
         code,
