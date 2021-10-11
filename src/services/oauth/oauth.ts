@@ -34,6 +34,11 @@ export class OAuthService {
     const user = await this.userRepository.getByOAuth(oauthId, oauthType)
 
     if (user) {
+      if (user.name !== name || user.icon !== icon) {
+        user.update({ name, icon })
+        await this.userRepository.update(user)
+      }
+
       return user
     }
 
