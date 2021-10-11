@@ -12,7 +12,8 @@ export class UserController {
   }
 
   public async listUsers(ctx: Koa.Context): Promise<void> {
-    const { word } = ctx.query
+    const { word } = ctx.request.query || {}
+
     if (typeof word === 'string') {
       const users = await this.userService.search(word)
       ctx.status = 200
