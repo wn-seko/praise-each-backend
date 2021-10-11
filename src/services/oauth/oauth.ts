@@ -10,6 +10,7 @@ import { ApplicationError, errorCode } from '~/services/errors'
 interface GithubProfile {
   id: string
   name: string
+  login: string
   avatar_url: string
 }
 
@@ -31,18 +32,19 @@ export class OAuthService {
     name: string,
     icon: string,
   ): Promise<User> {
+    const sanitizedName = name.replace(/\s/g, '_')
     const user = await this.userRepository.getByOAuth(oauthId, oauthType)
 
     if (user) {
-      if (user.name !== name || user.icon !== icon) {
-        user.update({ name, icon })
+      if (user.name !== sanitizedName || user.icon !== icon) {
+        user.update({ name: sanitizedName, icon })
         await this.userRepository.update(user)
       }
 
       return user
     }
 
-    const newUser = new User({ name, icon })
+    const newUser = new User({ name: sanitizedName, icon })
     const newUserCredential = new UserCredential({
       userId: newUser.id,
       oauthId,
@@ -142,7 +144,7 @@ export class OAuthService {
       const user = await this.findOrCreate(
         profile.id,
         'github',
-        profile.name || 'Anonymous',
+        profile.name || profile.login || 'Anonymous',
         profile.avatar_url || '',
       )
 

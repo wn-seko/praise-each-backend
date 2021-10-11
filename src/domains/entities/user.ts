@@ -5,6 +5,7 @@ import {
   checkMinLength,
   checkMaxLength,
   checkValidUuidFormat,
+  checkNoWhiteSpace,
 } from '../validator'
 
 interface Props {
@@ -42,6 +43,7 @@ export class User {
   private checkName(value: string): string {
     checkMinLength(value, 1)
     checkMaxLength(value, 100)
+    checkNoWhiteSpace(value)
     return value
   }
 

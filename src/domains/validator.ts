@@ -44,6 +44,13 @@ export const checkAlphanumericAndUnderscoreHyphen = (value: string): string => {
   return value
 }
 
+export const checkNoWhiteSpace = (value: string): string => {
+  if (/\s/.test(value)) {
+    throwInvalidParameterError('white space is not allowed.', value)
+  }
+  return value
+}
+
 export const checkValidUuidFormat = (value: string): string => {
   if (
     !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(
