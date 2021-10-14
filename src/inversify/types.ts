@@ -8,4 +8,7 @@ export const TYPES = {
   UserService: Symbol(),
   UserPresenter: Symbol(),
   UserCredentialRepository: Symbol(),
+  TeamRepository: Symbol(),
+  TeamService: Symbol(),
+  TeamPresenter: Symbol(),
 }

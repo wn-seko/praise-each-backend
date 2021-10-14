@@ -6,38 +6,39 @@ import {
   checkMaxLength,
   checkValidUuidFormat,
   checkNoWhiteSpace,
+  checkColorCode,
 } from '../validator'
 
 interface Props {
   name: string
-  icon: string
+  color: string
 }
 
 interface ReadonlyProps extends SystemInfo {
-  teamIds: string[]
+  userIds: string[]
 }
 
-export type UserType = Props & ReadonlyProps
+export type TeamType = Props & ReadonlyProps
 
-export type UserResponse = Omit<UserType, 'createdAt' | 'updatedAt'> & {
+export type TeamResponse = Omit<TeamType, 'createdAt' | 'updatedAt'> & {
   createdAt: string
   updatedAt: string
 }
 
-export class User {
+export class Team {
   public readonly id: string
   public name: string
-  public icon: string
-  public teamIds: string[]
+  public color: string
+  public userIds: string[]
   public createdAt: Dayjs
   public updatedAt: Dayjs
 
-  constructor(user: UserType | Props) {
-    this.id = 'id' in user ? this.checkId(user.id) : uuid()
-    this.name = this.checkName(user.name)
-    this.icon = this.checkIcon(user.icon)
-    this.teamIds = 'teamIds' in user ? user.teamIds : []
-    this.createdAt = 'createdAt' in user ? user.createdAt : dayjs()
+  constructor(team: TeamType | Props) {
+    this.id = 'id' in team ? this.checkId(team.id) : uuid()
+    this.name = this.checkName(team.name)
+    this.color = this.checkColor(team.color)
+    this.userIds = 'userIds' in team ? this.checkUserIds(team.userIds) : []
+    this.createdAt = 'createdAt' in team ? team.createdAt : dayjs()
     this.updatedAt = this.createdAt.clone()
   }
 
@@ -53,15 +54,19 @@ export class User {
     return value
   }
 
-  private checkIcon(value: string): string {
-    checkMinLength(value, 1)
-    checkMaxLength(value, 5000)
+  private checkColor(value: string): string {
+    checkColorCode(value)
+    return value
+  }
+
+  private checkUserIds(value: string[]): string[] {
+    value.forEach((id) => checkValidUuidFormat(id))
     return value
   }
 
   public update(props: Partial<Props>) {
     this.name = props.name ??= this.name
-    this.icon = props.icon ??= this.icon
+    this.color = props.color ??= this.color
     this.updatedAt = dayjs()
   }
 
@@ -69,8 +74,8 @@ export class User {
     return {
       id: this.id,
       name: this.name,
-      icon: this.icon,
-      teamIds: this.teamIds,
+      color: this.color,
+      userIds: this.userIds,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     }
