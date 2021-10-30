@@ -13,4 +13,10 @@ export class OAuthController {
     const { token } = await this.oauthService.githubLogin(code || '')
     ctx.body = { token }
   }
+
+  public async googleLogin(ctx: Koa.Context): Promise<void> {
+    const { code } = ctx.request.body
+    const { token } = await this.oauthService.googleLogin(code || '')
+    ctx.body = { token }
+  }
 }
