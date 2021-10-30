@@ -128,6 +128,29 @@ export class OAuthService {
     })
   }
 
+  public async getLoginUrls(): Promise<{ [name: string]: string }> {
+    const urls: { [name: string]: string } = {}
+
+    if (
+      env.OAUTH_GITHUB_DOMAIN &&
+      env.OAUTH_GITHUB_CLIENT_ID &&
+      env.OAUTH_GITHUB_CLIENT_SECRET &&
+      env.OAUTH_GITHUB_CALLBACK_URL
+    ) {
+      urls.github = `https://${env.OAUTH_GITHUB_DOMAIN}/login/oauth/authorize?client_id=${env.OAUTH_GITHUB_CLIENT_ID}&scope=public_user`
+    }
+
+    if (
+      env.OAUTH_GOOGLE_CLIENT_ID &&
+      env.OAUTH_GOOGLE_CLIENT_SECRET &&
+      env.OAUTH_GOOGLE_CALLBACK_URL
+    ) {
+      urls.google = `https://accounts.google.com/o/oauth2/auth?&client_id=${env.OAUTH_GOOGLE_CLIENT_ID}&redirect_uri=${env.OAUTH_GOOGLE_CALLBACK_URL}&scope=https://www.googleapis.com/auth/userinfo.profile&response_type=code`
+    }
+
+    return urls
+  }
+
   public async githubLogin(code: string): Promise<{ token: string }> {
     if (!code) {
       throw new ApplicationError(

@@ -8,6 +8,11 @@ export class OAuthController {
     this.oauthService = oauthService
   }
 
+  public async getLoginUrls(ctx: Koa.Context): Promise<void> {
+    const urls = await this.oauthService.getLoginUrls()
+    ctx.body = urls
+  }
+
   public async githubLogin(ctx: Koa.Context): Promise<void> {
     const { code } = ctx.request.body
     const { token } = await this.oauthService.githubLogin(code || '')
