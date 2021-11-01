@@ -89,10 +89,12 @@ export class Praise {
   }
 
   public update(props: Partial<Props>) {
-    this.from = props.from ??= this.from
-    this.to = props.to ??= this.to
-    this.message = props.message ??= this.message
-    this.tags = props.tags ??= this.tags
+    this.from = props.from ? this.checkUserId(props.from) : this.from
+    this.to = props.to ? this.checkUserId(props.to) : this.to
+    this.message = props.message
+      ? this.checkMessage(props.message)
+      : this.message
+    this.tags = props.tags ? this.checkTags(props.tags) : this.tags
     this.updatedAt = dayjs()
   }
 

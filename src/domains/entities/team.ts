@@ -65,8 +65,8 @@ export class Team {
   }
 
   public update(props: Partial<Props>) {
-    this.name = props.name ??= this.name
-    this.color = props.color ??= this.color
+    this.name = props.name ? this.checkName(props.name) : this.name
+    this.color = props.color ? this.checkColor(props.color) : this.color
     this.updatedAt = dayjs()
   }
 

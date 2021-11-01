@@ -51,7 +51,9 @@ export class UserCredential {
   }
 
   public update(props: Partial<Props>): void {
-    this.oauthId = props.oauthId ?? this.oauthId
+    this.oauthId = props.oauthId
+      ? this.checkOAuthId(props.oauthId)
+      : this.oauthId
     this.oauthType = props.oauthType ?? this.oauthType
     this.updatedAt = dayjs()
   }

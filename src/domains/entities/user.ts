@@ -62,8 +62,8 @@ export class User {
   }
 
   public update(props: Partial<Props>) {
-    this.name = props.name ??= this.name
-    this.icon = props.icon ??= this.icon
+    this.name = props.name ? this.checkName(props.name) : this.name
+    this.icon = props.icon ? this.checkIcon(props.icon) : this.icon
     this.updatedAt = dayjs()
   }
 
