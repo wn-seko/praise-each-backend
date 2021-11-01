@@ -9,7 +9,7 @@ COPY ./src/infrastructures/seeds ./knex/seeds
 COPY ./src/env.ts ./src/env.ts
 COPY ./src/utils ./src/utils
 
-RUN apk add --no-cache bash curl nodejs=14.17.6-r0
+RUN apk add --no-cache bash curl nodejs=14.18.1-r0
 RUN touch ~/.bashrc \
     && curl -o- -L https://yarnpkg.com/install.sh | bash \
     && ln -s "$HOME/.yarn/bin/yarn" /usr/local/bin/yarn

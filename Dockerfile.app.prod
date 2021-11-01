@@ -8,7 +8,7 @@ RUN yarn && yarn build
 
 FROM alpine:3.13.0
 
-RUN apk add --no-cache nodejs=14.17.6-r0
+RUN apk add --no-cache nodejs=14.18.1-r0
 
 WORKDIR /opt/drive
 COPY --from=build-stage /opt/drive/dist/server.js ./
