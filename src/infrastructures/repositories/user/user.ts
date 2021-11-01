@@ -35,7 +35,11 @@ const userToDbType = (user: User): DbUserProps => ({
   updated_at: user.updatedAt.toISOString(),
 })
 
-const buildGetUsersQuery = (whereOptions: Record<string, unknown> = {}) => {
+const buildGetUsersQuery = (
+  whereOptions: Record<string, unknown> = {},
+  offset?: number,
+  limit?: number,
+) => {
   let baseQuery = knex.from('users')
 
   const { ids, name, ...options } = whereOptions
@@ -45,7 +49,7 @@ const buildGetUsersQuery = (whereOptions: Record<string, unknown> = {}) => {
   baseQuery = options ? baseQuery.where(options) : baseQuery
   baseQuery = baseQuery = baseQuery.as('u')
 
-  const mainQuery = knex
+  let mainQuery = knex
     .select([
       'u.*',
       knex.raw('ARRAY_AGG(user_affiliations.team_id) as team_ids'),
@@ -56,11 +60,20 @@ const buildGetUsersQuery = (whereOptions: Record<string, unknown> = {}) => {
       'u.id',
       'u.name',
       'u.icon',
+      'u.is_deleted',
       'u.created_at',
       'u.updated_at',
       'user_affiliations.user_id',
     )
     .orderBy('u.created_at', 'desc')
+
+  if (offset) {
+    mainQuery = mainQuery.offset(offset)
+  }
+
+  if (limit) {
+    mainQuery = mainQuery.limit(limit)
+  }
 
   return mainQuery
 }
