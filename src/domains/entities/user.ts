@@ -17,7 +17,7 @@ interface ReadonlyProps extends SystemInfo {
   teamIds: string[]
 }
 
-export type UserType = Props & ReadonlyProps
+export type UserType = Props & ReadonlyProps & { isDeleted: boolean }
 
 export type UserResponse = Omit<UserType, 'createdAt' | 'updatedAt'> & {
   createdAt: string
@@ -29,6 +29,7 @@ export class User {
   public name: string
   public icon: string
   public teamIds: string[]
+  public isDeleted: boolean
   public createdAt: Dayjs
   public updatedAt: Dayjs
 
@@ -37,6 +38,7 @@ export class User {
     this.name = this.checkName(user.name)
     this.icon = this.checkIcon(user.icon)
     this.teamIds = 'teamIds' in user ? user.teamIds : []
+    this.isDeleted = 'isDeleted' in user ? user.isDeleted : false
     this.createdAt = 'createdAt' in user ? user.createdAt : dayjs()
     this.updatedAt = this.createdAt.clone()
   }
@@ -71,6 +73,7 @@ export class User {
       name: this.name,
       icon: this.icon,
       teamIds: this.teamIds,
+      isDeleted: this.isDeleted,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     }

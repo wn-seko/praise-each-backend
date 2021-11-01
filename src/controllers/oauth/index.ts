@@ -9,4 +9,9 @@ const oauthController = new OAuthController(oauthService)
 
 export const oauthRouter = new Router({ prefix: '/oauth' })
 
+oauthRouter.get(
+  '/login_urls',
+  oauthController.getLoginUrls.bind(oauthController),
+)
 oauthRouter.post('/github', oauthController.githubLogin.bind(oauthController))
+oauthRouter.post('/google', oauthController.googleLogin.bind(oauthController))
