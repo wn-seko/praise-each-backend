@@ -11,10 +11,9 @@ import {
 interface Props {
   name: string
   icon: string
-  isDeleted: boolean
 }
 
-export type UserType = Props & SystemInfo
+export type UserType = Props & SystemInfo & { isDeleted: boolean }
 
 export type UserResponse = Omit<UserType, 'createdAt' | 'updatedAt'> & {
   createdAt: string
@@ -67,6 +66,7 @@ export class User {
       id: this.id,
       name: this.name,
       icon: this.icon,
+      isDeleted: this.isDeleted,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     }
