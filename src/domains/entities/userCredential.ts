@@ -8,7 +8,7 @@ import {
 interface Props {
   userId: string
   oauthId: string
-  oauthType: 'github'
+  oauthType: 'github' | 'google'
 }
 
 export type UserCredentialType = Props & {
@@ -27,7 +27,7 @@ export type UserCredentialResponse = Omit<
 export class UserCredential {
   public readonly userId: string
   public oauthId: string
-  public oauthType: 'github'
+  public oauthType: 'github' | 'google'
   public createdAt: Dayjs
   public updatedAt: Dayjs
 

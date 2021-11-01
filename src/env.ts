@@ -25,6 +25,9 @@ export const envValidators: EnvironmentValidators = {
   OAUTH_GITHUB_CLIENT_SECRET: (key) => toStringOrUndefined(key) ?? '',
   OAUTH_GITHUB_CALLBACK_URL: (key) => toStringOrUndefined(key) ?? '',
   OAUTH_GITHUB_DOMAIN: (key) => toStringOrUndefined(key) ?? 'github.com',
+  OAUTH_GOOGLE_CLIENT_ID: (key) => toStringOrUndefined(key) ?? '',
+  OAUTH_GOOGLE_CLIENT_SECRET: (key) => toStringOrUndefined(key) ?? '',
+  OAUTH_GOOGLE_CALLBACK_URL: (key) => toStringOrUndefined(key) ?? '',
   // eslint-disable-next-line no-process-env
   DEBUG_RESPONSE_ENABLED: () => process.env.NODE_ENV === 'development',
 }
