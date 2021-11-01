@@ -12,9 +12,14 @@ interface DbUserProps {
   updated_at: string
 }
 
-const resultToUser = (result: DbUserProps): User => {
+interface DbUserType extends DbUserProps {
+  team_ids: string[]
+}
+
+const resultToUser = (result: DbUserType): User => {
   return new User({
     ...result,
+    teamIds: (result.team_ids || []).filter((item) => !!item),
     isDeleted: !!result.is_deleted,
     createdAt: dayjs(result.created_at),
     updatedAt: dayjs(result.updated_at),
@@ -30,22 +35,65 @@ const userToDbType = (user: User): DbUserProps => ({
   updated_at: user.updatedAt.toISOString(),
 })
 
+const buildGetUsersQuery = (
+  whereOptions: Record<string, unknown> = {},
+  offset?: number,
+  limit?: number,
+) => {
+  let baseQuery = knex.from('users')
+
+  const { ids, name, ...options } = whereOptions
+
+  baseQuery = ids ? baseQuery.whereIn('id', ids as string[]) : baseQuery
+  baseQuery = name ? baseQuery.where('name', 'ilike', `%${name}%`) : baseQuery
+  baseQuery = options ? baseQuery.where(options) : baseQuery
+  baseQuery = baseQuery = baseQuery.as('u')
+
+  let mainQuery = knex
+    .select([
+      'u.*',
+      knex.raw('ARRAY_AGG(user_affiliations.team_id) as team_ids'),
+    ])
+    .from(baseQuery)
+    .leftJoin('user_affiliations', 'u.id', 'user_affiliations.user_id')
+    .groupBy(
+      'u.id',
+      'u.name',
+      'u.icon',
+      'u.is_deleted',
+      'u.created_at',
+      'u.updated_at',
+      'user_affiliations.user_id',
+    )
+    .orderBy('u.created_at', 'desc')
+
+  if (offset) {
+    mainQuery = mainQuery.offset(offset)
+  }
+
+  if (limit) {
+    mainQuery = mainQuery.limit(limit)
+  }
+
+  return mainQuery
+}
+
 export class SQLUserRepository implements UserRepository {
   async create(user: User): Promise<User> {
     const results = await knex<DbUserProps>('users').insert(
       userToDbType(user),
       '*',
     )
-    return resultToUser(results[0])
+    return resultToUser(results[0] as DbUserType)
   }
 
   async getById(id: string): Promise<User | undefined> {
-    const result = await knex<DbUserProps>('users').where({ id }).first('*')
+    const result = await buildGetUsersQuery({ id }).first('*')
     return result ? resultToUser(result) : undefined
   }
 
   async getByIds(ids: string[]): Promise<User[]> {
-    const results = await knex<DbUserProps>('users').whereIn('id', ids)
+    const results = await buildGetUsersQuery({ ids })
     return results.map(resultToUser)
   }
 
@@ -62,24 +110,21 @@ export class SQLUserRepository implements UserRepository {
   }
 
   async getList(): Promise<User[]> {
-    const results = await knex<DbUserProps>('users')
+    const results = await buildGetUsersQuery()
     return results.map(resultToUser)
   }
 
   async search(word: string): Promise<User[]> {
-    const results = await knex<DbUserProps>('users').where(
-      'name',
-      'ilike',
-      `%${word}%`,
-    )
+    const results = await buildGetUsersQuery({ name: word })
     return results.map(resultToUser)
   }
 
   async update(user: User): Promise<User> {
-    const result = await knex<DbUserProps>('users')
+    await knex<DbUserProps>('users')
       .where('id', user.id)
       .update(userToDbType(user), '*')
-    return resultToUser(result[0])
+
+    return (await this.getById(user.id)) as User
   }
 
   async deleteById(id: string): Promise<string> {

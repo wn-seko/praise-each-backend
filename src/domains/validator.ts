@@ -94,3 +94,11 @@ export const checkAlphanumericAndUnderscoreHyphenPeriod = (
 
   return value
 }
+
+export const checkColorCode = (value: string): string => {
+  if (!/^#[0-9a-f]{2}[0-9a-f]{2}[0-9a-f]{2}$/.test(value)) {
+    throwInvalidParameterError('Color format must be hex code.', value)
+  }
+
+  return value
+}

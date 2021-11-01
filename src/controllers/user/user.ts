@@ -17,17 +17,17 @@ export class UserController {
     if (typeof word === 'string') {
       const users = await this.userService.search(word)
       ctx.status = 200
-      ctx.body = this.userPresenter.usersToResponse(users)
+      ctx.body = await this.userPresenter.usersToResponse(users)
     } else {
       const users = await this.userService.listUsers()
       ctx.status = 200
-      ctx.body = this.userPresenter.usersToResponse(users)
+      ctx.body = await this.userPresenter.usersToResponse(users)
     }
   }
 
   public async getUser(ctx: Koa.Context): Promise<void> {
     const user = await this.userService.getUser(ctx.params['id'])
-    ctx.body = user ? this.userPresenter.userToResponse(user) : null
+    ctx.body = user ? await this.userPresenter.userToResponse(user) : null
   }
 
   public async updateUser(ctx: Koa.Context): Promise<void> {
@@ -35,7 +35,7 @@ export class UserController {
     const { name, icon } = ctx.request.body
     const user = await this.userService.updateUser(id, name, icon)
     ctx.status = 200
-    ctx.body = user ? this.userPresenter.userToResponse(user) : null
+    ctx.body = user ? await this.userPresenter.userToResponse(user) : null
   }
 
   public async deleteUser(ctx: Koa.Context): Promise<void> {
