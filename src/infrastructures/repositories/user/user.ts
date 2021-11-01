@@ -7,6 +7,7 @@ interface DbUserProps {
   id: string
   name: string
   icon: string
+  is_deleted: boolean
   created_at: string
   updated_at: string
 }
@@ -14,6 +15,7 @@ interface DbUserProps {
 const resultToUser = (result: DbUserProps): User => {
   return new User({
     ...result,
+    isDeleted: !!result.is_deleted,
     createdAt: dayjs(result.created_at),
     updatedAt: dayjs(result.updated_at),
   })
@@ -23,6 +25,7 @@ const userToDbType = (user: User): DbUserProps => ({
   id: user.id,
   name: user.name,
   icon: user.icon,
+  is_deleted: user.isDeleted,
   created_at: user.createdAt.toISOString(),
   updated_at: user.updatedAt.toISOString(),
 })

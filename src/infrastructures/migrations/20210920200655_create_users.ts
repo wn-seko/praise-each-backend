@@ -6,6 +6,7 @@ export async function up(knex: Knex): Promise<void> {
       t.string('id').primary()
       t.string('name').notNullable()
       t.string('icon').notNullable()
+      t.boolean('is_deleted').defaultTo(false)
       t.timestamp('created_at').notNullable()
       t.timestamp('updated_at').notNullable()
       t.index('name', 'users_name_idx')

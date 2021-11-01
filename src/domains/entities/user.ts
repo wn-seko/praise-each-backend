@@ -11,6 +11,7 @@ import {
 interface Props {
   name: string
   icon: string
+  isDeleted: boolean
 }
 
 export type UserType = Props & SystemInfo
@@ -24,6 +25,7 @@ export class User {
   public readonly id: string
   public name: string
   public icon: string
+  public isDeleted: boolean
   public createdAt: Dayjs
   public updatedAt: Dayjs
 
@@ -31,6 +33,7 @@ export class User {
     this.id = 'id' in user ? this.checkId(user.id) : uuid()
     this.name = this.checkName(user.name)
     this.icon = this.checkIcon(user.icon)
+    this.isDeleted = 'isDeleted' in user ? user.isDeleted : false
     this.createdAt = 'createdAt' in user ? user.createdAt : dayjs()
     this.updatedAt = this.createdAt.clone()
   }
