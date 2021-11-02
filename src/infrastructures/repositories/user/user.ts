@@ -78,6 +78,11 @@ const buildGetUsersQuery = (
   return mainQuery
 }
 
+const buildGetUserQuery = (userId: string) => {
+  const mainQuery = buildGetUsersQuery({ id: userId }, 0, 1)
+  return mainQuery.first()
+}
+
 export class SQLUserRepository implements UserRepository {
   async create(user: User): Promise<User> {
     const results = await knex<DbUserProps>('users').insert(
@@ -88,7 +93,7 @@ export class SQLUserRepository implements UserRepository {
   }
 
   async getById(id: string): Promise<User | undefined> {
-    const result = await buildGetUsersQuery({ id }).first('*')
+    const result = await buildGetUserQuery(id)
     return result ? resultToUser(result) : undefined
   }
 
