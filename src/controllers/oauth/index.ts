@@ -10,8 +10,38 @@ const oauthController = new OAuthController(oauthService)
 export const oauthRouter = new Router({ prefix: '/oauth' })
 
 oauthRouter.get(
-  '/login_urls',
+  '/links/login',
   oauthController.getLoginUrls.bind(oauthController),
 )
-oauthRouter.post('/github', oauthController.githubLogin.bind(oauthController))
-oauthRouter.post('/google', oauthController.googleLogin.bind(oauthController))
+oauthRouter.get(
+  '/links/update_icon',
+  oauthController.getUpdateIconUrls.bind(oauthController),
+)
+oauthRouter.get(
+  '/links/linkage',
+  oauthController.getLinkageUrls.bind(oauthController),
+)
+oauthRouter.post(
+  '/github/login',
+  oauthController.githubLogin.bind(oauthController),
+)
+oauthRouter.post(
+  '/github/update_icon',
+  oauthController.githubUpdateIcon.bind(oauthController),
+)
+oauthRouter.post(
+  '/github/linkage',
+  oauthController.githubLinkage.bind(oauthController),
+)
+oauthRouter.post(
+  '/google/login',
+  oauthController.googleLogin.bind(oauthController),
+)
+oauthRouter.post(
+  '/google/update_icon',
+  oauthController.googleUpdateIcon.bind(oauthController),
+)
+oauthRouter.post(
+  '/google/linkage',
+  oauthController.googleLinkage.bind(oauthController),
+)

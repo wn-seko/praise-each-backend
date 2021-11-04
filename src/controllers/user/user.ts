@@ -1,6 +1,7 @@
-import Koa from 'koa'
+import { CustomContext } from '~/middlewares/context'
 import { UserPresenter } from '~/presenter/user'
 import { UserService } from '~/services/user'
+import { getJWT } from '~/utils/jwt'
 
 export class UserController {
   private readonly userService: UserService
@@ -11,7 +12,7 @@ export class UserController {
     this.userPresenter = userPresenter
   }
 
-  public async listUsers(ctx: Koa.Context): Promise<void> {
+  public async listUsers(ctx: CustomContext): Promise<void> {
     const { word } = ctx.request.query || {}
 
     if (typeof word === 'string') {
@@ -25,21 +26,21 @@ export class UserController {
     }
   }
 
-  public async getUser(ctx: Koa.Context): Promise<void> {
+  public async getUser(ctx: CustomContext): Promise<void> {
     const user = await this.userService.getUser(ctx.params['id'])
     ctx.body = user ? await this.userPresenter.userToResponse(user) : null
   }
 
-  public async updateUser(ctx: Koa.Context): Promise<void> {
-    const { id } = ctx.params
+  public async updateUser(ctx: CustomContext): Promise<void> {
+    const id = ctx.authUserId
     const { name, icon } = ctx.request.body
     const user = await this.userService.updateUser(id, name, icon)
     ctx.status = 200
-    ctx.body = user ? await this.userPresenter.userToResponse(user) : null
+    ctx.body = { token: getJWT(user) }
   }
 
-  public async deleteUser(ctx: Koa.Context): Promise<void> {
-    const { id } = ctx.params
+  public async deleteUser(ctx: CustomContext): Promise<void> {
+    const id = ctx.authUserId
     const deletedId = await this.userService.deleteUser(id)
     ctx.status = 200
     ctx.body = { id: deletedId }
