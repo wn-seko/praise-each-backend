@@ -1,6 +1,7 @@
 import { CustomContext } from '~/middlewares/context'
 import { UserPresenter } from '~/presenter/user'
 import { UserService } from '~/services/user'
+import { getJWT } from '~/utils/jwt'
 
 export class UserController {
   private readonly userService: UserService
@@ -35,7 +36,7 @@ export class UserController {
     const { name, icon } = ctx.request.body
     const user = await this.userService.updateUser(id, name, icon)
     ctx.status = 200
-    ctx.body = user ? await this.userPresenter.userToResponse(user) : null
+    ctx.body = { token: getJWT(user) }
   }
 
   public async deleteUser(ctx: CustomContext): Promise<void> {
