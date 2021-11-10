@@ -47,6 +47,12 @@ export class TeamController {
     ctx.body = team ? await this.teamPresenter.teamToResponse(team) : null
   }
 
+  public async getMyTeams(ctx: CustomContext): Promise<void> {
+    const userId = ctx.authUserId
+    const teams = await this.teamService.getByUserId(userId)
+    ctx.body = teams
+  }
+
   public async updateTeam(ctx: CustomContext): Promise<void> {
     const { id } = ctx.params
     const { name, color } = ctx.request.body

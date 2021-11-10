@@ -13,6 +13,7 @@ export const teamRouter = new Router({ prefix: '/teams' })
 
 teamRouter
   .get('/', teamController.listTeams.bind(teamController))
+  .get('/my', teamController.getMyTeams.bind(teamController))
   .post('/', teamController.createTeam.bind(teamController))
   .get('/:id', teamController.getTeam.bind(teamController))
   .put('/:id', teamController.updateTeam.bind(teamController))

@@ -6,6 +6,7 @@ export interface TeamRepository {
   count: (word: string) => Promise<number>
   getById(id: string): Promise<Team | undefined>
   getByIds(ids: string[]): Promise<Team[]>
+  getByUserId(userId: string): Promise<Team[]>
   getList(offset: number, limit: number): Promise<Team[]>
   search(word: string, offset: number, limit: number): Promise<Team[]>
   update(team: Team): Promise<Team>
