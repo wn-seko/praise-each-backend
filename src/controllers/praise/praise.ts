@@ -15,11 +15,11 @@ export class PraiseController {
   }
 
   public async listPraises(ctx: CustomContext): Promise<void> {
-    const { from, to, offset = 0, limit = 20 } = ctx.request.query || {}
+    const { from, to, page = 1, limit = 20 } = ctx.request.query || {}
     const praises = await this.praiseService.listPraises({
       from: typeof from === 'object' ? from[0] : from,
       to: typeof to === 'object' ? to[0] : to,
-      offset: Number(offset),
+      offset: (Number(page) - 1) * Number(limit),
       limit: Number(limit),
     })
     ctx.body = await this.praisePresenter.praisesToResponse(praises)
