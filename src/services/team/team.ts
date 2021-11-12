@@ -99,6 +99,13 @@ export class TeamService {
     return await this.teamRepository.getById(id)
   }
 
+  public async getByUserId(userId: string): Promise<Team[]> {
+    await this.checkExistsUser(userId)
+
+    const teams = await this.teamRepository.getByUserId(userId)
+    return teams
+  }
+
   public async updateTeam(
     id: string,
     name: string,

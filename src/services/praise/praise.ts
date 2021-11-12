@@ -1,21 +1,26 @@
 import { Praise, PraiseQueryParams } from '~/domains/entities/praise'
 import { PraiseLike } from '~/domains/entities/praiseLike'
 import { PraiseUpVote } from '~/domains/entities/praiseUpVote'
+import { Team } from '~/domains/entities/team'
 import { User } from '~/domains/entities/user'
 import { PraiseRepository } from '~/domains/repositories/praise'
+import { TeamRepository } from '~/domains/repositories/team'
 import { UserRepository } from '~/domains/repositories/user'
 import { ApplicationError, errorCode } from '~/services/errors/index'
 
 export class PraiseService {
   private readonly praiseRepository: PraiseRepository
   private readonly userRepository: UserRepository
+  private readonly teamRepository: TeamRepository
 
   public constructor(
     praiseRepository: PraiseRepository,
     userRepository: UserRepository,
+    teamRepository: TeamRepository,
   ) {
     this.praiseRepository = praiseRepository
     this.userRepository = userRepository
+    this.teamRepository = teamRepository
   }
 
   private async checkExistsUser(userId: string): Promise<User> {
@@ -28,6 +33,18 @@ export class PraiseService {
     }
 
     return user
+  }
+
+  private async checkExistsTeam(teamId: string): Promise<Team> {
+    const team = await this.teamRepository.getById(teamId)
+
+    if (!team) {
+      throw new ApplicationError(errorCode.NOT_FOUND, 'Team is not found.', {
+        id: teamId,
+      })
+    }
+
+    return team
   }
 
   private async checkExistsPraise(praiseId: string): Promise<Praise> {
@@ -63,8 +80,21 @@ export class PraiseService {
     return await this.praiseRepository.create(praise)
   }
 
-  public async listPraises(queryParams: PraiseQueryParams): Promise<Praise[]> {
-    return await this.praiseRepository.getList(queryParams)
+  public async listPraises(
+    queryParams: PraiseQueryParams & { teamId?: string },
+  ): Promise<Praise[]> {
+    const { teamId, ...options } = queryParams
+
+    if (teamId) {
+      const team = await this.checkExistsTeam(teamId)
+      return await this.praiseRepository.getList({
+        ...options,
+        from: team.userIds,
+        to: team.userIds,
+      })
+    }
+
+    return await this.praiseRepository.getList(options)
   }
 
   public async getPraise(id: string): Promise<Praise | undefined> {

@@ -123,6 +123,28 @@ export class SQLTeamRepository implements TeamRepository {
     return results.map(resultToTeam)
   }
 
+  async getByUserId(userId: string): Promise<Team[]> {
+    const teams = await knex<DbTeamProps[]>()
+      .select([
+        'teams.*',
+        knex.raw('ARRAY_AGG(user_affiliations.user_id) as user_ids'),
+      ])
+      .from('teams')
+      .leftJoin('user_affiliations', 'teams.id', 'user_affiliations.team_id')
+      .where({ 'user_affiliations.user_id': userId })
+      .groupBy(
+        'teams.id',
+        'teams.name',
+        'teams.color',
+        'teams.created_at',
+        'teams.updated_at',
+        'user_affiliations.team_id',
+      )
+      .orderBy('teams.created_at', 'desc')
+
+    return teams.map(resultToTeam)
+  }
+
   async getList(offset: number, limit: number): Promise<Team[]> {
     const results = await buildGetTeamsQuery({}, offset, limit)
     return results.map(resultToTeam)

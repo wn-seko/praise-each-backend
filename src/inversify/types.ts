@@ -11,4 +11,6 @@ export const TYPES = {
   TeamRepository: Symbol(),
   TeamService: Symbol(),
   TeamPresenter: Symbol(),
+  TeamPinRepository: Symbol(),
+  TeamPinService: Symbol(),
 }
