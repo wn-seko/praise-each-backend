@@ -35,8 +35,8 @@ export type PraiseResponse = Omit<
 }
 
 export interface PraiseQueryParams {
-  from?: string
-  to?: string
+  from?: string | string[]
+  to?: string | string[]
   offset: number
   limit: number
 }

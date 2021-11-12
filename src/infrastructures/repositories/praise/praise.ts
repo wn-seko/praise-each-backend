@@ -36,6 +36,17 @@ interface DbPraiseUpVote {
   created_at: string
 }
 
+interface WhereQueryOptions {
+  id?: string
+  from?: string | string[]
+  to?: string | string[]
+}
+
+interface PaginationOptions {
+  limit?: number
+  offset?: number
+}
+
 const sanitizeQuery = (queryParams: PraiseQueryParams) =>
   Object.fromEntries(Object.entries(queryParams).filter(([, v]) => v != null))
 
@@ -72,11 +83,33 @@ const praiseUpVoteToDbType = (upVote: PraiseUpVote): DbPraiseUpVote => ({
 })
 
 const buildGetPraisesQuery = (
-  whereOptions: Partial<DbPraiseProps> = {},
-  offset?: number,
-  limit?: number,
+  options: WhereQueryOptions,
+  pagination?: PaginationOptions,
 ) => {
-  const baseQuery = knex.select('*').from('praises').where(whereOptions).as('p')
+  const whereOptions: { from?: string; to?: string } = {}
+  let baseQuery = knex.select('*').from('praises')
+
+  if (options.from) {
+    if (typeof options.from === 'string') {
+      whereOptions.from = options.from
+    } else {
+      baseQuery = baseQuery.whereIn('from', options.from)
+    }
+  }
+
+  if (options.to) {
+    if (typeof options.to === 'string') {
+      whereOptions.to = options.to
+    } else {
+      baseQuery = baseQuery.whereIn('to', options.to)
+    }
+  }
+
+  baseQuery = Object.keys(whereOptions).length
+    ? baseQuery.where(options)
+    : baseQuery
+
+  baseQuery = baseQuery = baseQuery.as('p')
 
   const subQuery = knex
     .select(['p.*', knex.raw('ARRAY_AGG(praise_likes.user_id) as likes')])
@@ -114,12 +147,12 @@ const buildGetPraisesQuery = (
     )
     .orderBy('t1.created_at', 'desc')
 
-  if (offset) {
-    mainQuery = mainQuery.offset(offset)
+  if (pagination?.offset) {
+    mainQuery = mainQuery.offset(pagination.offset)
   }
 
-  if (limit) {
-    mainQuery = mainQuery.limit(limit)
+  if (pagination?.limit) {
+    mainQuery = mainQuery.limit(pagination.limit)
   }
 
   return mainQuery
@@ -143,7 +176,10 @@ export class SQLPraiseRepository implements PraiseRepository {
     try {
       const sanitizedWhereOptions = sanitizeQuery(queryParams)
       const { offset, limit, ...whereOptions } = sanitizedWhereOptions
-      const results = await buildGetPraisesQuery(whereOptions, offset, limit)
+      const results = await buildGetPraisesQuery(whereOptions, {
+        offset,
+        limit,
+      })
       return results.map(resultToPraise)
     } catch (e) {
       console.error(e)
