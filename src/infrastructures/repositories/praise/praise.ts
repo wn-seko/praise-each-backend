@@ -89,6 +89,10 @@ const buildGetPraisesQuery = (
   const whereOptions: { from?: string; to?: string } = {}
   let baseQuery = knex.select('*').from('praises')
 
+  if (options.id) {
+    baseQuery = baseQuery.where({ id: options.id })
+  }
+
   if (options.from) {
     if (typeof options.from === 'string') {
       whereOptions.from = options.from
