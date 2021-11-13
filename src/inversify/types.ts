@@ -13,4 +13,6 @@ export const TYPES = {
   TeamPresenter: Symbol(),
   TeamPinRepository: Symbol(),
   TeamPinService: Symbol(),
+  TagRepository: Symbol(),
+  TagService: Symbol(),
 }
