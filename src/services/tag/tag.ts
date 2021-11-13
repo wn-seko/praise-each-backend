@@ -17,6 +17,18 @@ export class TagService {
   }
 
   public async create(name: string): Promise<Tag> {
+    const tagCount = await this.tagRepository.count(name)
+
+    if (tagCount > 0) {
+      throw new ApplicationError(
+        errorCode.NOT_FOUND,
+        'Tag is already exists.',
+        {
+          name,
+        },
+      )
+    }
+
     const tag = new Tag({ name })
     return await this.tagRepository.create(tag)
   }

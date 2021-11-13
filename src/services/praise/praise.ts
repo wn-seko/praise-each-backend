@@ -1,9 +1,11 @@
 import { Praise, PraiseQueryParams } from '~/domains/entities/praise'
 import { PraiseLike } from '~/domains/entities/praiseLike'
 import { PraiseUpVote } from '~/domains/entities/praiseUpVote'
+import { Tag } from '~/domains/entities/tag'
 import { Team } from '~/domains/entities/team'
 import { User } from '~/domains/entities/user'
 import { PraiseRepository } from '~/domains/repositories/praise'
+import { TagRepository } from '~/domains/repositories/tag'
 import { TeamRepository } from '~/domains/repositories/team'
 import { UserRepository } from '~/domains/repositories/user'
 import { ApplicationError, errorCode } from '~/services/errors/index'
@@ -12,15 +14,18 @@ export class PraiseService {
   private readonly praiseRepository: PraiseRepository
   private readonly userRepository: UserRepository
   private readonly teamRepository: TeamRepository
+  private readonly tagRepository: TagRepository
 
   public constructor(
     praiseRepository: PraiseRepository,
     userRepository: UserRepository,
     teamRepository: TeamRepository,
+    tagRepository: TagRepository,
   ) {
     this.praiseRepository = praiseRepository
     this.userRepository = userRepository
     this.teamRepository = teamRepository
+    this.tagRepository = tagRepository
   }
 
   private async checkExistsUser(userId: string): Promise<User> {
@@ -59,6 +64,16 @@ export class PraiseService {
     return praise
   }
 
+  private async createTagIfNotExists(tags: string[]) {
+    for (const tag of tags) {
+      const sanitizedTag = tag.replace(/^#/, '')
+      const tagCount = await this.tagRepository.count(sanitizedTag)
+      if (!tagCount) {
+        await this.tagRepository.create(new Tag({ name: sanitizedTag }))
+      }
+    }
+  }
+
   public async createPraise(
     from: string,
     to: string,
@@ -74,6 +89,8 @@ export class PraiseService {
         'Posting to yourself is not allowed.',
       )
     }
+
+    await this.createTagIfNotExists(tags)
 
     const praise = new Praise({ from, to, message, tags })
 

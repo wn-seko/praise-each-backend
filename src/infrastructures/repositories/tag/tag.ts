@@ -40,13 +40,12 @@ export class SQLTagRepository implements TagRepository {
   async count(word: string): Promise<number> {
     let query = knex<number>('tags').count('*')
     query = word ? query.where('name', 'ilike', `%${word}%`) : query
-    return await query.first('*')
+    const { count } = await query.first<{ count: string }>()
+    return Number(count)
   }
 
   async getList(offset: number, limit: number): Promise<Tag[]> {
-    const results = await knex<DbTagProps>('team_pins')
-      .offset(offset)
-      .limit(limit)
+    const results = await knex<DbTagProps>('tags').offset(offset).limit(limit)
     return results.map(resultToTag)
   }
 
