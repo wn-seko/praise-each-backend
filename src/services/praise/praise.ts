@@ -9,6 +9,7 @@ import { TagRepository } from '~/domains/repositories/tag'
 import { TeamRepository } from '~/domains/repositories/team'
 import { TeamSlackWebhookRepository } from '~/domains/repositories/teamSlackWebhook'
 import { UserRepository } from '~/domains/repositories/user'
+import { env } from '~/env'
 import { ApplicationError, errorCode } from '~/services/errors/index'
 import { intersection } from '~/utils/collection'
 import { postSlackWebhook } from '~/utils/webhook/slack'
@@ -96,9 +97,13 @@ export class PraiseService {
 
       for (const teamSlackWebhook of teamSlackWebhooks) {
         try {
+          const serviceLink = env.APPLICATION_URL
+            ? `\n<${env.APPLICATION_URL}|PraiseEachを確認する>`
+            : ''
+
           await postSlackWebhook(
             teamSlackWebhook.url,
-            `${from.name} → ${to.name}\n${message}\n<https://d3kmkgq9e4prar.cloudfront.net|PraiseEachを確認する>`,
+            `${from.name} → ${to.name}\n${message}${serviceLink}`,
           )
         } catch (e) {
           // noop
