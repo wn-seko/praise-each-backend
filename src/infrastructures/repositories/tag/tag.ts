@@ -45,13 +45,17 @@ export class SQLTagRepository implements TagRepository {
   }
 
   async getList(offset: number, limit: number): Promise<Tag[]> {
-    const results = await knex<DbTagProps>('tags').offset(offset).limit(limit)
+    const results = await knex<DbTagProps>('tags')
+      .orderBy('created_at', 'desc')
+      .offset(offset)
+      .limit(limit)
     return results.map(resultToTag)
   }
 
   async search(word: string, offset: number, limit: number): Promise<Tag[]> {
     const results = await knex<DbTagProps>('tags')
       .where('name', 'ilike', `%${word}%`)
+      .orderBy('created_at', 'desc')
       .offset(offset)
       .limit(limit)
     return results.map(resultToTag)
