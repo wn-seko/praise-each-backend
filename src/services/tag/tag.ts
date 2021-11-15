@@ -11,7 +11,7 @@ export class TagService {
   }
 
   private getPagination(offset: number, limit: number, count: number) {
-    const currentPage = offset + 1
+    const currentPage = Math.ceil(offset / limit) + 1
     const pages = Math.ceil(count / limit)
     return { currentPage, limit, pages }
   }
