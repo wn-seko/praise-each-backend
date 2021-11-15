@@ -5,6 +5,7 @@ import { rootRouter } from '~/controllers/root'
 import { tagRouter } from '~/controllers/tag'
 import { teamRouter } from '~/controllers/team'
 import { teamPinRouter } from '~/controllers/teamPin'
+import { teamSlackWebhookRouter } from '~/controllers/teamSlackWebhook'
 import { userRouter } from '~/controllers/user'
 
 const routerList = [
@@ -15,6 +16,7 @@ const routerList = [
   teamRouter,
   teamPinRouter,
   tagRouter,
+  teamSlackWebhookRouter,
 ]
 
 export const routers = (app: Koa): void => {

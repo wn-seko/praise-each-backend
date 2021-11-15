@@ -18,5 +18,6 @@ export type Environment = {
   OAUTH_GOOGLE_CLIENT_ID: string
   OAUTH_GOOGLE_CLIENT_SECRET: string
   OAUTH_GOOGLE_CALLBACK_URL: string
+  APPLICATION_URL: string
   DEBUG_RESPONSE_ENABLED: boolean
 }

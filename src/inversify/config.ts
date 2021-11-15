@@ -5,12 +5,14 @@ import { PraiseRepository } from '~/domains/repositories/praise'
 import { TagRepository } from '~/domains/repositories/tag'
 import { TeamRepository } from '~/domains/repositories/team'
 import { TeamPinRepository } from '~/domains/repositories/teamPin'
+import { TeamSlackWebhookRepository } from '~/domains/repositories/teamSlackWebhook'
 import { UserRepository } from '~/domains/repositories/user'
 import { UserCredentialRepository } from '~/domains/repositories/userCredential'
 import { SQLPraiseRepository } from '~/infrastructures/repositories/praise'
 import { SQLTagRepository } from '~/infrastructures/repositories/tag'
 import { SQLTeamRepository } from '~/infrastructures/repositories/team'
 import { SQLTeamPinRepository } from '~/infrastructures/repositories/teamPin'
+import { SQLTeamSlackWebhookRepository } from '~/infrastructures/repositories/teamSlackWebhook'
 import { SQLUserRepository } from '~/infrastructures/repositories/user'
 import { SQLUserCredentialRepository } from '~/infrastructures/repositories/userCredential'
 import { PraisePresenter } from '~/presenter/praise'
@@ -21,6 +23,7 @@ import { PraiseService } from '~/services/praise'
 import { TagService } from '~/services/tag'
 import { TeamService } from '~/services/team'
 import { TeamPinService } from '~/services/teamPin'
+import { TeamSlackWebhookService } from '~/services/teamSlackWebhook'
 import { UserService } from '~/services/user'
 
 export const container = new Container()
@@ -36,6 +39,9 @@ container
   .bind<TeamPinRepository>(TYPES.TeamPinRepository)
   .to(SQLTeamPinRepository)
 container.bind<TagRepository>(TYPES.TagRepository).to(SQLTagRepository)
+container
+  .bind<TeamSlackWebhookRepository>(TYPES.TeamSlackWebhookRepository)
+  .to(SQLTeamSlackWebhookRepository)
 
 // resolve service injection
 container.bind<OAuthService>(TYPES.OAuthService).to(OAuthService)
@@ -44,6 +50,9 @@ container.bind<UserService>(TYPES.UserService).to(UserService)
 container.bind<TeamService>(TYPES.TeamService).to(TeamService)
 container.bind<TeamPinService>(TYPES.TeamPinService).to(TeamPinService)
 container.bind<TagService>(TYPES.TagService).to(TagService)
+container
+  .bind<TeamSlackWebhookService>(TYPES.TeamSlackWebhookService)
+  .to(TeamSlackWebhookService)
 
 // resolve presenter injection
 container.bind<PraisePresenter>(TYPES.PraisePresenter).to(PraisePresenter)

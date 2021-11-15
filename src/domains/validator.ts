@@ -1,3 +1,4 @@
+import { isUri } from 'valid-url'
 import { ApplicationError, errorCode } from '~/services/errors'
 
 const throwInvalidParameterError = (message: string, value: unknown) => {
@@ -98,6 +99,14 @@ export const checkAlphanumericAndUnderscoreHyphenPeriod = (
 export const checkColorCode = (value: string): string => {
   if (!/^#[0-9a-f]{2}[0-9a-f]{2}[0-9a-f]{2}$/.test(value)) {
     throwInvalidParameterError('Color format must be hex code.', value)
+  }
+
+  return value
+}
+
+export const checkUrl = (value: string): string => {
+  if (!isUri(value)) {
+    throwInvalidParameterError('url is invalid.', value)
   }
 
   return value

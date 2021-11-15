@@ -1,8 +1,8 @@
 import request from 'request'
 
-export const post = async <T extends {}>(
+export const post = async <T extends {}, B extends unknown = unknown>(
   uri: string,
-  data: Record<string, string> = {},
+  data: Record<string, B> = {},
   headers: Record<string, string> = {},
 ): Promise<{ response: request.Response; body: T }> => {
   return new Promise((resolve, reject) => {

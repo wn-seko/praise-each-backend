@@ -7,25 +7,32 @@ import { User } from '~/domains/entities/user'
 import { PraiseRepository } from '~/domains/repositories/praise'
 import { TagRepository } from '~/domains/repositories/tag'
 import { TeamRepository } from '~/domains/repositories/team'
+import { TeamSlackWebhookRepository } from '~/domains/repositories/teamSlackWebhook'
 import { UserRepository } from '~/domains/repositories/user'
+import { env } from '~/env'
 import { ApplicationError, errorCode } from '~/services/errors/index'
+import { intersection } from '~/utils/collection'
+import { postSlackWebhook } from '~/utils/webhook/slack'
 
 export class PraiseService {
   private readonly praiseRepository: PraiseRepository
   private readonly userRepository: UserRepository
   private readonly teamRepository: TeamRepository
   private readonly tagRepository: TagRepository
+  private readonly teamSlackWebhookRepository: TeamSlackWebhookRepository
 
   public constructor(
     praiseRepository: PraiseRepository,
     userRepository: UserRepository,
     teamRepository: TeamRepository,
     tagRepository: TagRepository,
+    teamSlackWebhookRepository: TeamSlackWebhookRepository,
   ) {
     this.praiseRepository = praiseRepository
     this.userRepository = userRepository
     this.teamRepository = teamRepository
     this.tagRepository = tagRepository
+    this.teamSlackWebhookRepository = teamSlackWebhookRepository
   }
 
   private async checkExistsUser(userId: string): Promise<User> {
@@ -74,14 +81,45 @@ export class PraiseService {
     }
   }
 
+  private async postSlackWebhookFeed(from: User, to: User, message: string) {
+    const fromUserTeam = await this.teamRepository.getByUserId(from.id)
+    const toUserTeam = await this.teamRepository.getByUserId(to.id)
+
+    const teams = intersection(
+      fromUserTeam,
+      toUserTeam,
+      (team: Team) => team.id,
+    )
+
+    for (const team of teams) {
+      const teamSlackWebhooks =
+        await this.teamSlackWebhookRepository.getByTeamId(team.id)
+
+      for (const teamSlackWebhook of teamSlackWebhooks) {
+        try {
+          const serviceLink = env.APPLICATION_URL
+            ? `\n<${env.APPLICATION_URL}|PraiseEachを確認する>`
+            : ''
+
+          await postSlackWebhook(
+            teamSlackWebhook.url,
+            `${from.name} → ${to.name}\n${message}${serviceLink}`,
+          )
+        } catch (e) {
+          // noop
+        }
+      }
+    }
+  }
+
   public async createPraise(
     from: string,
     to: string,
     message: string,
     tags: string[],
   ): Promise<Praise> {
-    await this.checkExistsUser(from)
-    await this.checkExistsUser(to)
+    const fromUser = await this.checkExistsUser(from)
+    const toUser = await this.checkExistsUser(to)
 
     if (from === to) {
       throw new ApplicationError(
@@ -93,6 +131,8 @@ export class PraiseService {
     await this.createTagIfNotExists(tags)
 
     const praise = new Praise({ from, to, message, tags })
+
+    await this.postSlackWebhookFeed(fromUser, toUser, message)
 
     return await this.praiseRepository.create(praise)
   }

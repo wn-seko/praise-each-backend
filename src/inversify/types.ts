@@ -15,4 +15,6 @@ export const TYPES = {
   TeamPinService: Symbol(),
   TagRepository: Symbol(),
   TagService: Symbol(),
+  TeamSlackWebhookRepository: Symbol(),
+  TeamSlackWebhookService: Symbol(),
 }
