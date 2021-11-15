@@ -102,7 +102,6 @@ export class PraiseService {
           )
         } catch (e) {
           // noop
-          console.error(e)
         }
       }
     }
