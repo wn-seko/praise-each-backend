@@ -195,8 +195,7 @@ export class SQLPraiseRepository implements PraiseRepository {
     const [updated] = await knex<DbPraiseType>('praises')
       .where('id', praise.id)
       .update(praiseToDbType(praise), '*')
-
-    return (await this.getById(updated.id)) as Praise
+    return resultToPraise(updated)
   }
 
   async deleteById(id: string): Promise<string> {
