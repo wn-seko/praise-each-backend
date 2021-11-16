@@ -172,7 +172,7 @@ export class SQLPraiseRepository implements PraiseRepository {
   }
 
   async getById(id: string): Promise<Praise | undefined> {
-    const result = await knex<DbPraiseType>('praises').where({ id }).first('*')
+    const result = await buildGetPraisesQuery({ id }).first()
     return result ? resultToPraise(result) : undefined
   }
 
@@ -192,10 +192,11 @@ export class SQLPraiseRepository implements PraiseRepository {
   }
 
   async update(praise: PraiseType): Promise<Praise> {
-    const results = await knex<DbPraiseType>('praises')
+    const [updated] = await knex<DbPraiseType>('praises')
       .where('id', praise.id)
-      .update(praise, '*')
-    return resultToPraise(results[0])
+      .update(praiseToDbType(praise), '*')
+
+    return (await this.getById(updated.id)) as Praise
   }
 
   async deleteById(id: string): Promise<string> {

@@ -160,14 +160,20 @@ export class PraiseService {
 
   public async updatePraise(
     id: string,
-    from?: string,
-    to?: string,
+    userId: string,
     message?: string,
     tags?: string[],
   ): Promise<Praise> {
     const praise = await this.checkExistsPraise(id)
 
-    praise.update({ from, to, message, tags })
+    if (praise.from !== userId) {
+      throw new ApplicationError(
+        errorCode.INVALID_PARAMETER,
+        'Method not allowed.',
+      )
+    }
+
+    praise.update({ message, tags })
 
     return await this.praiseRepository.update(praise)
   }
