@@ -14,6 +14,10 @@ export class UserService {
   }
 
   public async search(word: string): Promise<User[]> {
+    if (!word) {
+      return []
+    }
+
     return await this.userRepository.search(word)
   }
 
