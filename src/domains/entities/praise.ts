@@ -61,7 +61,7 @@ export class Praise {
     this.likes = praise.likes ?? []
     this.upVotes = praise.upVotes ?? []
     this.createdAt = praise?.createdAt ?? dayjs()
-    this.updatedAt = this.createdAt.clone()
+    this.updatedAt = praise?.updatedAt ?? this.createdAt.clone()
   }
 
   private checkId(value: string): string {
