@@ -48,12 +48,11 @@ export class PraiseController {
 
   public async updatePraise(ctx: CustomContext): Promise<void> {
     const { id } = ctx.params
-    const { to, message, tags } = ctx.request.body || {}
+    const { message, tags } = ctx.request.body || {}
     const userId = ctx.authUserId
     const praise = await this.praiseService.updatePraise(
       id,
       userId,
-      to,
       message,
       tags,
     )
