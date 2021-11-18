@@ -119,6 +119,7 @@ export class Praise {
       tags: this.tags,
       likes: this.likes,
       upVotes: this.upVotes,
+      stamps: this.stamps,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     }
