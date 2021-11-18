@@ -63,7 +63,16 @@ export class PraisePresenter {
 
   public async praiseToResponse(praise: Praise): Promise<PraiseResponse> {
     const userIds = Array.from(
-      new Set([praise.from, praise.to, ...praise.likes, ...praise.upVotes]),
+      new Set([
+        praise.from,
+        praise.to,
+        ...praise.likes,
+        ...praise.upVotes,
+        ...praise.stamps.reduce(
+          (stampUserIds, stamp) => stampUserIds.concat(stamp.userIds),
+          [] as string[],
+        ),
+      ]),
     )
 
     const users = await this.userRepository.getByIds(userIds)
