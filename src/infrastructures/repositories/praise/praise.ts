@@ -114,15 +114,20 @@ const stampResultToStamp = (
   const stamps = stampObjects
     .filter((item) => !!item.userId && !!item.stampId)
     .reduce((memo, item) => {
-      const candidate = memo.find(
-        (memoItem) => memoItem.stampId === item.stampId,
+      const updated = memo.map((memoItem) =>
+        memoItem.stampId === item.stampId
+          ? { ...memoItem, userIds: memoItem.userIds.concat([item.userId]) }
+          : memoItem,
       )
-      if (candidate) {
-        candidate.userIds.concat([item.userId])
-        return memo
-      } else {
-        return memo.concat([{ stampId: item.stampId, userIds: [item.userId] }])
+
+      const isNew =
+        memo.findIndex((memoItem) => memoItem.stampId === item.stampId) === -1
+
+      if (isNew) {
+        updated.push({ stampId: item.stampId, userIds: [item.userId] })
       }
+
+      return updated
     }, [] as Array<{ stampId: string; userIds: string[] }>)
 
   return stamps
