@@ -1,5 +1,6 @@
 import { Praise, PraiseQueryParams } from '~/domains/entities/praise'
 import { PraiseLike } from '~/domains/entities/praiseLike'
+import { PraiseStamp } from '~/domains/entities/praiseStamp'
 import { PraiseUpVote } from '~/domains/entities/praiseUpVote'
 
 export interface PraiseRepository {
@@ -12,4 +13,6 @@ export interface PraiseRepository {
   deleteLike(like: PraiseLike): Promise<Praise>
   createUpVote(upVote: PraiseUpVote): Promise<Praise>
   deleteUpVote(upVote: PraiseUpVote): Promise<Praise>
+  createStamp(stamp: PraiseStamp): Promise<Praise>
+  deleteStamp(stamp: PraiseStamp): Promise<Praise>
 }

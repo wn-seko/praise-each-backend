@@ -19,6 +19,10 @@ export class PraisePresenter {
       to: userHashMap[praise.to],
       likes: praise.likes.map((userId) => userHashMap[userId]),
       upVotes: praise.upVotes.map((userId) => userHashMap[userId]),
+      stamps: praise.stamps.map((stamp) => ({
+        stampId: stamp.stampId,
+        users: stamp.userIds.map((userId) => userHashMap[userId]),
+      })),
     }
   }
 
@@ -28,11 +32,21 @@ export class PraisePresenter {
         ...praises.map((praise) => praise.from),
         ...praises.map((praise) => praise.to),
         ...praises.reduce(
-          (memo, praise) => memo.concat(praise.likes),
+          (userIds, praise) => userIds.concat(praise.likes),
           [] as string[],
         ),
         ...praises.reduce(
-          (memo, praise) => memo.concat(praise.upVotes),
+          (userIds, praise) => userIds.concat(praise.upVotes),
+          [] as string[],
+        ),
+        ...praises.reduce(
+          (userIds, praise) =>
+            userIds.concat(
+              praise.stamps.reduce(
+                (stampUserIds, stamp) => stampUserIds.concat(stamp.userIds),
+                [] as string[],
+              ),
+            ),
           [] as string[],
         ),
       ]),

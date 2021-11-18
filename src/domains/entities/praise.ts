@@ -8,6 +8,11 @@ import {
 } from '../validator'
 import { UserResponse } from './user'
 
+interface Stamp {
+  stampId: string
+  userIds: string[]
+}
+
 interface Props {
   from: string
   to: string
@@ -18,18 +23,23 @@ interface Props {
 interface ReadonlyProps extends SystemInfo {
   likes: string[]
   upVotes: string[]
+  stamps: Stamp[]
 }
 
 export type PraiseType = Props & ReadonlyProps
 
 export type PraiseResponse = Omit<
   PraiseType,
-  'from' | 'to' | 'likes' | 'upVotes' | 'createdAt' | 'updatedAt'
+  'from' | 'to' | 'likes' | 'upVotes' | 'stamps' | 'createdAt' | 'updatedAt'
 > & {
   from: UserResponse
   to: UserResponse
   likes: UserResponse[]
   upVotes: UserResponse[]
+  stamps: Array<{
+    stampId: string
+    users: UserResponse[]
+  }>
   createdAt: string
   updatedAt: string
 }
@@ -49,6 +59,7 @@ export class Praise {
   public tags: string[]
   public likes: string[]
   public upVotes: string[]
+  public stamps: Stamp[]
   public createdAt: Dayjs
   public updatedAt: Dayjs
 
@@ -60,6 +71,7 @@ export class Praise {
     this.tags = this.checkTags(praise.tags)
     this.likes = praise.likes ?? []
     this.upVotes = praise.upVotes ?? []
+    this.stamps = praise.stamps ?? []
     this.createdAt = praise?.createdAt ?? dayjs()
     this.updatedAt = praise?.updatedAt ?? this.createdAt.clone()
   }
@@ -107,6 +119,7 @@ export class Praise {
       tags: this.tags,
       likes: this.likes,
       upVotes: this.upVotes,
+      stamps: this.stamps,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     }

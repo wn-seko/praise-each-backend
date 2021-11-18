@@ -5,6 +5,7 @@ import {
   PraiseType,
 } from '~/domains/entities/praise'
 import { PraiseLike } from '~/domains/entities/praiseLike'
+import { PraiseStamp } from '~/domains/entities/praiseStamp'
 import { PraiseUpVote } from '~/domains/entities/praiseUpVote'
 import { PraiseRepository } from '~/domains/repositories/praise'
 import { knex } from '~/infrastructures/database'
@@ -22,6 +23,7 @@ interface DbPraiseProps {
 interface DbPraiseType extends DbPraiseProps {
   likes: string[]
   up_votes: string[]
+  stamps: string
 }
 
 interface DbPraiseLike {
@@ -33,6 +35,13 @@ interface DbPraiseLike {
 interface DbPraiseUpVote {
   praise_id: string
   user_id: string
+  created_at: string
+}
+
+interface DbPraiseStamp {
+  praise_id: string
+  user_id: string
+  stamp_id: string
   created_at: string
 }
 
@@ -55,6 +64,7 @@ const resultToPraise = (result: DbPraiseType): Praise => {
     ...result,
     likes: (result.likes || []).filter((item) => !!item),
     upVotes: (result.up_votes || []).filter((item) => !!item),
+    stamps: stampResultToStamp(result.stamps),
     createdAt: dayjs(result.created_at),
     updatedAt: dayjs(result.updated_at),
   })
@@ -81,6 +91,56 @@ const praiseUpVoteToDbType = (upVote: PraiseUpVote): DbPraiseUpVote => ({
   user_id: upVote.userId,
   created_at: upVote.createdAt.toISOString(),
 })
+
+const praiseStampToDbType = (stamp: PraiseStamp): DbPraiseStamp => ({
+  praise_id: stamp.praiseId,
+  user_id: stamp.userId,
+  stamp_id: stamp.stampId,
+  created_at: stamp.createdAt.toISOString(),
+})
+
+const stampResultToStamp = (
+  tupleString: string,
+): Array<{ stampId: string; userIds: string[] }> => {
+  const arrayOfUserIdAndStampId = tupleToArray(tupleString)
+  const stampObjects = arrayOfUserIdAndStampId.map(
+    (userIdAntStampId) =>
+      Object.fromEntries([
+        ['userId', userIdAntStampId[0]],
+        ['stampId', userIdAntStampId[1]],
+      ]) as { userId: string; stampId: string },
+  )
+
+  const stamps = stampObjects
+    .filter((item) => !!item.userId && !!item.stampId)
+    .reduce((memo, item) => {
+      const candidate = memo.find(
+        (memoItem) => memoItem.stampId === item.stampId,
+      )
+      if (candidate) {
+        candidate.userIds.concat([item.userId])
+        return memo
+      } else {
+        return memo.concat([{ stampId: item.stampId, userIds: [item.userId] }])
+      }
+    }, [] as Array<{ stampId: string; userIds: string[] }>)
+
+  return stamps
+}
+
+const tupleToArray = (tupleString: string): string[][] => {
+  try {
+    return JSON.parse(
+      tupleString
+        .replace(/\{/g, '[')
+        .replace(/\}/g, ']')
+        .replace(/\(/g, '')
+        .replace(/\)/g, ''),
+    ).map((item: string) => item.split(','))
+  } catch (e) {
+    return []
+  }
+}
 
 const buildGetPraisesQuery = (
   options: WhereQueryOptions,
@@ -115,7 +175,7 @@ const buildGetPraisesQuery = (
 
   baseQuery = baseQuery = baseQuery.as('p')
 
-  const subQuery = knex
+  const joinPraiseLikeQuery = knex
     .select(['p.*', knex.raw('ARRAY_AGG(praise_likes.user_id) as likes')])
     .from(baseQuery)
     .leftJoin('praise_likes', 'p.id', 'praise_likes.praise_id')
@@ -131,12 +191,12 @@ const buildGetPraisesQuery = (
     )
     .as('t1')
 
-  let mainQuery = knex
-    .select<DbPraiseType[]>([
+  const joinPraiseUpVoteQuery = knex
+    .select([
       't1.*',
       knex.raw('ARRAY_AGG(praise_up_votes.user_id) as up_votes'),
     ])
-    .from(subQuery)
+    .from(joinPraiseLikeQuery)
     .leftJoin('praise_up_votes', 't1.id', 'praise_up_votes.praise_id')
     .groupBy(
       't1.id',
@@ -149,7 +209,30 @@ const buildGetPraisesQuery = (
       't1.updated_at',
       'praise_up_votes.praise_id',
     )
-    .orderBy('t1.created_at', 'desc')
+    .as('t2')
+
+  let mainQuery = knex
+    .select<DbPraiseType[]>([
+      't2.*',
+      knex.raw(
+        'ARRAY_AGG((praise_stamps.user_id, praise_stamps.stamp_id) ORDER BY praise_stamps.created_at ASC) as stamps',
+      ),
+    ])
+    .from(joinPraiseUpVoteQuery)
+    .leftJoin('praise_stamps', 't2.id', 'praise_stamps.praise_id')
+    .groupBy(
+      't2.id',
+      't2.from',
+      't2.to',
+      't2.message',
+      't2.tags',
+      't2.likes',
+      't2.up_votes',
+      't2.created_at',
+      't2.updated_at',
+      'praise_stamps.praise_id',
+    )
+    .orderBy('t2.created_at', 'desc')
 
   if (pagination?.offset) {
     mainQuery = mainQuery.offset(pagination.offset)
@@ -234,6 +317,28 @@ export class SQLPraiseRepository implements PraiseRepository {
       .delete()
 
     const result = await buildGetPraisesQuery({ id: upVote.praiseId }).first()
+    return resultToPraise(result)
+  }
+
+  async createStamp(stamp: PraiseStamp): Promise<Praise> {
+    await knex<DbPraiseStamp>('praise_stamps').insert(
+      praiseStampToDbType(stamp),
+    )
+
+    const result = await buildGetPraisesQuery({ id: stamp.praiseId }).first()
+    return resultToPraise(result)
+  }
+
+  async deleteStamp(stamp: PraiseStamp): Promise<Praise> {
+    await knex<DbPraiseStamp>('praise_stamps')
+      .where({
+        praise_id: stamp.praiseId,
+        user_id: stamp.userId,
+        stamp_id: stamp.stampId,
+      })
+      .delete()
+
+    const result = await buildGetPraisesQuery({ id: stamp.praiseId }).first()
     return resultToPraise(result)
   }
 }
