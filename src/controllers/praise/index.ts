@@ -30,3 +30,11 @@ praiseRouter
     '/:id/up_votes',
     praiseController.deletePraiseUpVote.bind(praiseController),
   )
+  .post(
+    '/:id/stamps/:stampId',
+    praiseController.createPraiseStamp.bind(praiseController),
+  )
+  .delete(
+    '/:id/stamps/:stampId',
+    praiseController.deletePraiseStamp.bind(praiseController),
+  )

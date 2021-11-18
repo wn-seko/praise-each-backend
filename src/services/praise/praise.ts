@@ -1,5 +1,6 @@
 import { Praise, PraiseQueryParams } from '~/domains/entities/praise'
 import { PraiseLike } from '~/domains/entities/praiseLike'
+import { PraiseStamp } from '~/domains/entities/praiseStamp'
 import { PraiseUpVote } from '~/domains/entities/praiseUpVote'
 import { Tag } from '~/domains/entities/tag'
 import { Team } from '~/domains/entities/team'
@@ -218,5 +219,31 @@ export class PraiseService {
     const praiseUpVote = new PraiseUpVote({ praiseId: id, userId })
 
     return await this.praiseRepository.deleteUpVote(praiseUpVote)
+  }
+
+  public async createPraiseStamp(
+    id: string,
+    userId: string,
+    stampId: string,
+  ): Promise<Praise> {
+    await this.checkExistsPraise(id)
+    await this.checkExistsUser(userId)
+
+    const praiseStamp = new PraiseStamp({ praiseId: id, userId, stampId })
+
+    return await this.praiseRepository.createStamp(praiseStamp)
+  }
+
+  public async deletePraiseStamp(
+    id: string,
+    userId: string,
+    stampId: string,
+  ): Promise<Praise> {
+    await this.checkExistsPraise(id)
+    await this.checkExistsUser(userId)
+
+    const praiseStamp = new PraiseStamp({ praiseId: id, userId, stampId })
+
+    return await this.praiseRepository.deleteStamp(praiseStamp)
   }
 }

@@ -105,4 +105,32 @@ export class PraiseController {
       ? await this.praisePresenter.praiseToResponse(praise)
       : null
   }
+
+  public async createPraiseStamp(ctx: CustomContext): Promise<void> {
+    const { id, stampId } = ctx.params
+    const userId = ctx.authUserId
+    const praise = await this.praiseService.createPraiseStamp(
+      id,
+      userId,
+      stampId,
+    )
+
+    ctx.body = praise
+      ? await this.praisePresenter.praiseToResponse(praise)
+      : null
+  }
+
+  public async deletePraiseStamp(ctx: CustomContext): Promise<void> {
+    const { id, stampId } = ctx.params
+    const userId = ctx.authUserId
+    const praise = await this.praiseService.deletePraiseStamp(
+      id,
+      userId,
+      stampId,
+    )
+
+    ctx.body = praise
+      ? await this.praisePresenter.praiseToResponse(praise)
+      : null
+  }
 }
